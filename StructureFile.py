@@ -1,13 +1,17 @@
 from pathlib import Path
+
 from nbt import nbt
 import numpy as np
 
 
 class StructureFile:
 
-    def __init__(self,
-                 filePath: Path):
+    def __init__(
+        self,
+        filePath: Path
+    ):
         filePath = filePath.with_suffix('.nbt')
+        self.name = filePath.name
         self.nbt = nbt.NBTFile(filename=filePath)
         with open(filePath, 'rb') as file:
             self.file = file.read()

@@ -1,20 +1,35 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from StructureBase import Structure
 from pathlib import Path
+from importlib import import_module
+
 from StructureFile import StructureFile
 
 
 class StructureFolder:
 
-    def __init__(self,
-                 structureFolder: Path,
-                 structureName: str
-                 ):
+    structureClass: Structure
+    name: str
+    structureFile: StructureFile
+    decorationStructureFiles: dict[str, StructureFile]
+    transitionStructureFiles: dict[str, StructureFile]
 
-        self.structureName = structureName
+    def __init__(
+        self,
+        structureFolder: Path,
+        name: str,
+        namespace: str
+    ):
 
-        self.structureFile = StructureFile(structureFolder / structureName)
+        self.name = name
+        self.namespace = namespace
+
+        self.structureFile = StructureFile(structureFolder / name)
 
         self.transitionStructureFiles = dict()
-        for connectorStructureFile in structureFolder.glob('connectors/*'):
+        for connectorStructureFile in structureFolder.glob('transitions/*'):
             if connectorStructureFile.is_file() and connectorStructureFile.name.endswith('.nbt'):
                 self.transitionStructureFiles[connectorStructureFile.name] = StructureFile(connectorStructureFile)
 
@@ -22,3 +37,12 @@ class StructureFolder:
         for decorationStructionFile in structureFolder.glob('decorations/*'):
             if decorationStructionFile.is_file() and decorationStructionFile.name.endswith('.nbt'):
                 self.decorationStructureFiles[decorationStructionFile.name] = StructureFile(decorationStructionFile)
+
+        structureModulePath = f'structures.{self.namespace}.{self.name}.{self.name}'
+        structureModule = import_module(structureModulePath)
+        if structureModule is None:
+            raise FileNotFoundError(f'No module found at {structureModulePath}')
+        self.structureClass = getattr(
+            structureModule,
+            name.replace('_', ' ').title().replace(' ', '')
+        )

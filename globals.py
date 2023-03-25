@@ -1,20 +1,22 @@
 from StructureFolder import StructureFolder
 from pathlib import Path
 
-global structureFiles
+global structureFolders
 
 
 def initialize():
-    global structureFiles
-    structureFiles = dict()
+    global structureFolders
+    structureFolders = dict()
     loadStructureFiles()
 
 
 def loadStructureFiles():
-    for structureFolder in Path('.').glob('structures/debug/*/'):
+    namespace = 'debug'
+    for structureFolder in Path('.').glob(f'structures/{namespace}/*/'):
         if structureFolder.is_dir():
-            structureFileName = structureFolder.name
-            structureFiles[structureFileName] = StructureFolder(
+            structureName = structureFolder.name
+            structureFolders[structureName] = StructureFolder(
                 structureFolder=structureFolder,
-                structureName=structureFileName
+                name=structureName,
+                namespace=namespace
             )
