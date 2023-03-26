@@ -1,13 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from uuid import uuid4
 
 if TYPE_CHECKING:
     from StructureFolder import StructureFolder
     from StructureFile import StructureFile
 
+from glm import ivec3
+
 from gdpc.gdpc.interface import placeStructure
 from gdpc.gdpc.vector_tools import Box
-from glm import ivec3
 
 
 class Structure:
@@ -23,6 +25,8 @@ class Structure:
         self,
         structureFolder: StructureFolder
     ):
+        self.uuid = uuid4()
+
         self.structureFile = structureFolder.structureFile
         self.transitionStructureFiles = structureFolder.transitionStructureFiles
         self.decorationStructureFiles = structureFolder.decorationStructureFiles
@@ -63,7 +67,10 @@ class Structure:
             position=self.position, rotate=facing, mirror=None,
             pivot=ivec3(*self.structureFile.getCenterPivot())
         )
-        print(f"Placed {self.structureFile.name} ({response}) at {self.position} facing {facing}")
+        print(f"Placed {self} ({response}) at {self.position} facing {facing}")
 
     def getPostProcessingSteps(self):
         pass
+
+    def __repr__(self):
+        return f'{__class__.__name__} {self.uuid} {self.structureFile}'

@@ -46,3 +46,6 @@ class StructureFolder:
             structureModule,
             name.replace('_', ' ').title().replace(' ', '')
         )
+
+    def __repr__(self):
+        return f'{__class__.__name__} {self.namespace}.{self.name}'
