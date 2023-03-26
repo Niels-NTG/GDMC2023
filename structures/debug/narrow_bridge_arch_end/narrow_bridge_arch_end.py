@@ -3,7 +3,7 @@ import globals
 from StructureBase import Structure as StructureBase
 
 
-class NarrowBridgeArch(StructureBase):
+class NarrowBridgeArchEnd(StructureBase):
 
     def __init__(self):
         super().__init__(structureFolder=globals.structureFolders[Path(__file__).parent.name])
@@ -11,14 +11,14 @@ class NarrowBridgeArch(StructureBase):
             {
                 'facing': 0,
                 'nextStructure': [
-                    'narrow_bridge_middle',
-                    'narrow_bridge_arch'
+                    'narrow_short_bridge'
                 ]
             },
             {
                 'facing': 2,
                 'nextStructure': [
-                    'narrow_bridge_head'
+                    'narrow_bridge_middle',
+                    'narrow_bridge_arch_end'
                 ]
             }
         ]

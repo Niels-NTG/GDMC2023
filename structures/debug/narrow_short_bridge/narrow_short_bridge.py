@@ -14,7 +14,7 @@ class NarrowShortBridge(StructureBase):
                     'narrow_hub',
                     'narrow_hallway',
                     'narrow_exit',
-                    'narrow_bridge_head'
+                    'narrow_bridge_arch_start'
                 ]
             },
             {
@@ -23,7 +23,7 @@ class NarrowShortBridge(StructureBase):
                     'narrow_hub',
                     'narrow_hallway',
                     'narrow_exit',
-                    'narrow_bridge_head'
+                    'narrow_bridge_arch_start'
                 ]
             }
         ]

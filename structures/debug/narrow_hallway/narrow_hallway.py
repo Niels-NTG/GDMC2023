@@ -11,8 +11,6 @@ class NarrowHallway(StructureBase):
             {
                 'facing': 0,
                 'nextStructure': [
-                    'narrow_hub',
-                    'narrow_hallway',
                     'narrow_short_bridge',
                     'narrow_exit'
                 ]
@@ -20,8 +18,6 @@ class NarrowHallway(StructureBase):
             {
                 'facing': 2,
                 'nextStructure': [
-                    'narrow_hub',
-                    'narrow_hallway',
                     'narrow_short_bridge',
                     'narrow_exit'
                 ]

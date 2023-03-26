@@ -11,13 +11,13 @@ class NarrowBridgeMiddle(StructureBase):
             {
                 'facing': 0,
                 'nextStructure': [
-                    'narrow_bridge_arch'
+                    'narrow_bridge_arch_end'
                 ]
             },
             {
                 'facing': 2,
                 'nextStructure': [
-                    'narrow_bridge_arch'
+                    'narrow_bridge_arch_start'
                 ]
             }
         ]

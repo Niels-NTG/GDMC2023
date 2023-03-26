@@ -10,8 +10,6 @@ class NarrowHub(Structure):
         self.connectors = [
             {
                 'facing': 0,
-                # TODO implement transitionStructure
-                # "transitionStructure": self.transitionStructureFiles[0]
                 'nextStructure': [
                     'narrow_hallway',
                     'narrow_exit',
@@ -20,8 +18,6 @@ class NarrowHub(Structure):
             },
             {
                 'facing': 1,
-                # TODO implement transitionStructure
-                # "transitionStructure": self.transitionStructureFiles[0]
                 'nextStructure': [
                     'narrow_hallway',
                     'narrow_exit',
@@ -30,8 +26,6 @@ class NarrowHub(Structure):
             },
             {
                 'facing': 2,
-                # TODO implement transitionStructure
-                # "transitionStructure": self.transitionStructureFiles[0]
                 'nextStructure': [
                     'narrow_hallway',
                     'narrow_exit',
@@ -40,8 +34,6 @@ class NarrowHub(Structure):
             },
             {
                 'facing': 3,
-                # TODO implement transitionStructure
-                # "transitionStructure": self.transitionStructureFiles[0]
                 'nextStructure': [
                     'narrow_hallway',
                     'narrow_exit',
