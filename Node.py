@@ -1,0 +1,89 @@
+from __future__ import annotations
+
+import numpy as np
+from numpy.random import Generator
+
+import globals
+from StructureFolder import StructureFolder
+from gdpc.gdpc.vector_tools import Box
+import vectorTools
+from StructureBase import Structure
+from structures.debug.narrow_hub.narrow_hub import NarrowHub
+
+
+class Node:
+
+    candidateStructures: list | None
+    facing: int | None
+    selectedStructure: Structure
+    rng: Generator
+    parentNode: Node | None
+
+    def __init__(
+        self,
+        parentNode: Node = None,
+        facing: int = None,
+        candidateStructures: list = None,
+        rng=np.random.default_rng(),
+    ):
+        self.rng = rng
+        self.parentNode = parentNode
+        self.facing = 0 if facing is None else facing
+        # self.facing = self.rng.integers(4) if facing is None else facing
+        self.candidateStructures = candidateStructures
+
+        self.selectedStructure = self.selectStructure()
+
+        globals.structureCount = globals.structureCount + 1
+        if globals.structureCount < globals.maxStructureCount:
+            # TODO add Node instances to a tree/graph (NetworkX?) instead of placing it right away
+            self.place()
+
+    def selectStructure(self) -> Structure | None:
+        if self.parentNode is None:
+            # TODO create empty dummy origin structure class that itself finds a suitable initial position in the world
+            startStructure = NarrowHub()
+            startStructure.setPosition(globals.startPosition)
+            return startStructure
+        if len(self.parentNode.selectedStructure.connectors) > 0:
+            structureName = self.rng.choice(self.candidateStructures)
+            if structureName in globals.structureFolders:
+                structureFolder: StructureFolder = globals.structureFolders[structureName]
+                if structureFolder is None:
+                    raise FileNotFoundError(f'Structure file {structureName} does not exist in global collection.')
+                # noinspection PyCallingNonCallable
+                return structureFolder.structureClass()
+        return None
+
+    def place(self):
+
+        if self.selectedStructure is None:
+            pass
+
+        if self.parentNode is None:
+            self.selectedStructure.setPosition(globals.startPosition)
+        else:
+            selectedStructureBox: Box = self.selectedStructure.getBox()
+            parentStructureBox: Box = self.parentNode.selectedStructure.getBox()
+            self.selectedStructure.setPosition(vectorTools.getNextPosition(
+                facing=self.facing,
+                currentBox=parentStructureBox,
+                nextBox=selectedStructureBox
+            ))
+
+        self.selectedStructure.place(facing=self.facing)
+
+        for connector in self.selectedStructure.connectors:
+
+            connectionRotation: int = (connector.get('facing') + self.facing) % 4
+
+            if self.parentNode and (connector.get('facing') + self.facing + 2) % 4 == self.facing:
+                continue
+
+            # Next node
+            Node(
+                parentNode=self,
+                facing=connectionRotation,
+                candidateStructures=connector.get('nextStructure', []),
+                rng=self.rng,
+            )
