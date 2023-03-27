@@ -1,10 +1,12 @@
-from glm import ivec3
-
-from StructureFolder import StructureFolder
 from pathlib import Path
 
-global startPosition
+from gdpc.gdpc import interface
+from StructureFolder import StructureFolder
+
+global buildarea
 global structureFolders
+
+# DEBUG
 global structureCount
 global maxStructureCount
 
@@ -13,9 +15,10 @@ def initialize():
     global structureFolders
     structureFolders = dict()
     loadStructureFiles()
-    global startPosition
-    # TODO implement getbuildarea
-    startPosition = ivec3(423, 0, 166)
+    global buildarea
+    buildarea = interface.getBuildArea()
+
+    # DEBUG
     global structureCount
     structureCount = 0
     global maxStructureCount

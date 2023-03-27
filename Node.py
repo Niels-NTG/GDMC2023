@@ -43,7 +43,7 @@ class Node:
         if self.parentNode is None:
             # TODO create empty dummy origin structure class that itself finds a suitable initial position in the world
             startStructure = NarrowHub()
-            startStructure.setPosition(globals.startPosition)
+            startStructure.setPosition(globals.buildarea.offset)
             return startStructure
         if len(self.parentNode.selectedStructure.connectors) > 0:
             structureName = self.rng.choice(self.candidateStructures)
@@ -61,7 +61,7 @@ class Node:
             pass
 
         if self.parentNode is None:
-            self.selectedStructure.setPosition(globals.startPosition)
+            self.selectedStructure.setPosition(globals.buildarea.offset)
         else:
             selectedStructureBox: Box = self.selectedStructure.getBox()
             parentStructureBox: Box = self.parentNode.selectedStructure.getBox()
