@@ -18,7 +18,7 @@ class NarrowBridgeArchEnd(StructureBase):
                 'facing': 2,
                 'nextStructure': [
                     'narrow_bridge_middle',
-                    'narrow_bridge_arch_end'
+                    'narrow_bridge_arch_start'
                 ]
             }
         ]
