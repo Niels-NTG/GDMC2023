@@ -6,43 +6,19 @@ from glm import ivec3
 
 def getNextPosition(facing: int = 0, currentBox: Box = None, nextBox: Box = None) -> ivec3:
     if currentBox is None:
-        # noinspection PyTypeChecker
-        currentBox = Box(ivec3(0, 0, 0), ivec3(0, 0, 0))
+        currentBox = Box()
     if nextBox is None:
-        # noinspection PyTypeChecker
-        nextBox = Box(ivec3(0, 0, 0), ivec3(0, 0, 0))
-    if facing == 0:
-        return currentBox.translated(
-            ivec3(
-                currentBox.size.x,
-                nextBox.offset.y,
-                (currentBox.size.z - nextBox.size.z) // 2
-            )
-        ).offset
-    if facing == 1:
-        return currentBox.translated(
-            ivec3(
-                (currentBox.size.x - nextBox.size.x) // 2,
-                nextBox.offset.y,
-                currentBox.size.z
-            )
-        ).offset
-    if facing == 2:
-        return currentBox.translated(
-            ivec3(
-                -nextBox.size.x,
-                nextBox.offset.y,
-                (currentBox.size.z - nextBox.size.z) // 2
-            )
-        ).offset
-    if facing == 3:
-        return currentBox.translated(
-            ivec3(
-                (currentBox.size.x - nextBox.size.x) // 2,
-                nextBox.offset.y,
-                -nextBox.size.z
-            )
-        ).offset
+        nextBox = Box()
+
+    currentCenter = ivec3(currentBox.center.x, 0, currentBox.center.z)
+    nextCenter = ivec3(currentBox.size.x + nextBox.center.x, 0, currentCenter.z)
+    nextPoint = rotatePointAroundOrigin(
+        origin=currentCenter,
+        point=nextCenter,
+        rotation=facing
+    )
+    nextPoint = nextPoint - ivec3(nextBox.middle.x, 0, nextBox.middle.z)
+    return nextPoint
 
 
 def rotatePointAroundOrigin(origin: ivec3 = ivec3(0, 0, 0), point: ivec3 = ivec3(0, 0, 0), rotation: int = 0) -> ivec3:

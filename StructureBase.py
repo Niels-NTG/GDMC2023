@@ -19,12 +19,16 @@ class Structure:
     transitionStructureFiles: dict[str, StructureFile]
     structureFile: StructureFile
 
-    position: ivec3 | None
+    _position: ivec3
+    _facing: int
 
     def __init__(
         self,
-        structureFolder: StructureFolder
+        structureFolder: StructureFolder,
+        position: ivec3,
+        facing: int = 0,
     ):
+
         self.uuid = uuid4()
 
         self.structureFile = structureFolder.structureFile
@@ -32,18 +36,34 @@ class Structure:
         self.decorationStructureFiles = structureFolder.decorationStructureFiles
         self.connectors = []
 
-        self.position = None
-
-    def setPosition(self, position: ivec3 = ivec3(0, 0, 0)):
         self.position = position
+        self.facing = facing
+
+    @property
+    def position(self):
+        return self._position
+
+    @position.setter
+    def position(self, value: ivec3):
+        self._position = value
+
+    @property
+    def facing(self):
+        return self._facing
+
+    @facing.setter
+    def facing(self, value: int):
+        self._facing = value % 4
+
+    def isSameType(self, otherStructure: Structure = None):
+        if otherStructure:
+            return otherStructure.structureFile == self.structureFile
+        return False
 
     def getBox(self) -> Box:
-        if self.position is None:
-            self.setPosition()
         # noinspection PyTypeChecker
         return Box(
-            self.position,
-            ivec3(
+            size=ivec3(
                 self.structureFile.getSizeX(),
                 self.structureFile.getSizeY(),
                 self.structureFile.getSizeZ()
@@ -53,21 +73,14 @@ class Structure:
     def getPreProcessingSteps(self):
         pass
 
-    def place(
-        self,
-        position: ivec3 | None = None,
-        facing: int = None
-    ):
-        # TODO create debug structures with different colours of concrete
-        if position is not None:
-            self.setPosition(position)
+    def place(self):
 
         response = placeStructure(
             self.structureFile.file,
-            position=self.position, rotate=facing, mirror=None,
-            pivot=ivec3(*self.structureFile.getCenterPivot())
+            position=self.position, rotate=self.facing, mirror=None,
+            pivot=self.structureFile.getCenterPivot()
         )
-        print(f"Placed {self} ({response}) at {self.position} facing {facing}")
+        print(f"Placed {self} ({response}) at {self.position} facing {self.facing}")
 
     def getPostProcessingSteps(self):
         pass

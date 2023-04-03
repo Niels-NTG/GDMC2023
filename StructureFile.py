@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from glm import ivec3
 from nbt import nbt
 import numpy as np
 
@@ -72,12 +73,12 @@ class StructureFile:
     def getLongestHorizontalSize(self):
         return [self.getSizeX(), 0, self.getSizeZ()][self.getLongestHorizontalDimension()]
 
-    def getCenterPivot(self):
-        return [
-            int(np.floor(self.getSizeX() / 2)),
+    def getCenterPivot(self) -> ivec3:
+        return ivec3(
+            self.getSizeX() // 2,
             0,
-            int(np.floor(self.getSizeZ() / 2))
-        ]
+            self.getSizeZ() // 2
+        )
 
     def __repr__(self):
         return f'{__class__.__name__} {self.name}'

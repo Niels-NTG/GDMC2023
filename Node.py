@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+from glm import ivec3
 from numpy.random import Generator
 
 import globals
@@ -42,36 +43,40 @@ class Node:
     def selectStructure(self) -> Structure | None:
         if self.parentNode is None:
             # TODO create empty dummy origin structure class that itself finds a suitable initial position in the world
-            startStructure = NarrowHub()
-            startStructure.setPosition(globals.buildarea.offset)
+            startStructure = NarrowHub(position=globals.buildarea.offset, facing=self.facing)
             return startStructure
-        if len(self.parentNode.selectedStructure.connectors) > 0:
+        if len(self.candidateStructures) > 0:
             structureName = self.rng.choice(self.candidateStructures)
             if structureName in globals.structureFolders:
                 structureFolder: StructureFolder = globals.structureFolders[structureName]
                 if structureFolder is None:
                     raise FileNotFoundError(f'Structure file {structureName} does not exist in global collection.')
+
                 # noinspection PyCallingNonCallable
-                return structureFolder.structureClass()
+                selectedStructure: Structure = structureFolder.structureClass(
+                    facing=self.facing,
+                    position=ivec3(0, 0, 0)
+                )
+
+                parentStructureBox: Box = self.parentNode.selectedStructure.getBox()
+                selectedStructureBox: Box = selectedStructure.getBox()
+
+                nextPosition = vectorTools.getNextPosition(
+                    facing=self.facing,
+                    currentBox=parentStructureBox,
+                    nextBox=selectedStructureBox
+                ) + self.parentNode.selectedStructure.position
+                selectedStructure.position = nextPosition
+
+                return selectedStructure
         return None
 
     def place(self):
 
         if self.selectedStructure is None:
-            pass
+            return
 
-        if self.parentNode is None:
-            self.selectedStructure.setPosition(globals.buildarea.offset)
-        else:
-            selectedStructureBox: Box = self.selectedStructure.getBox()
-            parentStructureBox: Box = self.parentNode.selectedStructure.getBox()
-            self.selectedStructure.setPosition(vectorTools.getNextPosition(
-                facing=self.facing,
-                currentBox=parentStructureBox,
-                nextBox=selectedStructureBox
-            ))
-
-        self.selectedStructure.place(facing=self.facing)
+        self.selectedStructure.place()
 
         for connector in self.selectedStructure.connectors:
 
@@ -87,3 +92,6 @@ class Node:
                 candidateStructures=connector.get('nextStructure', []),
                 rng=self.rng,
             )
+
+    def __repr__(self):
+        return f'{__class__.__name__} {self.selectedStructure}'
