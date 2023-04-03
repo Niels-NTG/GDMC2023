@@ -5,6 +5,7 @@ from StructureFolder import StructureFolder
 
 global buildarea
 global structureFolders
+global nodeList
 
 # DEBUG
 global structureCount
@@ -18,11 +19,14 @@ def initialize():
     global buildarea
     buildarea = interface.getBuildArea()
 
+    global nodeList
+    nodeList = []
+
     # DEBUG
     global structureCount
     structureCount = 0
     global maxStructureCount
-    maxStructureCount = 32
+    maxStructureCount = 1200
 
 
 def loadStructureFiles():

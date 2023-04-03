@@ -58,9 +58,8 @@ class Node:
                     position=ivec3(0, 0, 0)
                 )
 
-                parentStructureBox: Box = self.parentNode.selectedStructure.getBox()
-                selectedStructureBox: Box = selectedStructure.getBox()
-
+                parentStructureBox: Box = self.parentNode.selectedStructure.box
+                selectedStructureBox: Box = selectedStructure.box
                 nextPosition = vectorTools.getNextPosition(
                     facing=self.facing,
                     currentBox=parentStructureBox,
@@ -68,8 +67,28 @@ class Node:
                 ) + self.parentNode.selectedStructure.position
                 selectedStructure.position = nextPosition
 
-                return selectedStructure
+                candidateScore = self.evaluateCandidateStructure(selectedStructure)
+                if candidateScore > 0:
+                    return selectedStructure
         return None
+
+    def evaluateCandidateStructure(self, candidateStructure: Structure = None):
+        if candidateStructure is None:
+            return 0
+
+        if len(globals.nodeList) > 1:
+            otherNode: Node
+            for otherNode in globals.nodeList:
+                hasIntersection = candidateStructure.isIntersection(otherNode.selectedStructure)
+                if hasIntersection:
+                    return 0
+
+        return 1
+
+    @property
+    def position(self):
+        if self.selectedStructure:
+            return self.selectedStructure.position
 
     def place(self):
 
@@ -77,6 +96,8 @@ class Node:
             return
 
         self.selectedStructure.place()
+
+        globals.nodeList.append(self)
 
         for connector in self.selectedStructure.connectors:
 

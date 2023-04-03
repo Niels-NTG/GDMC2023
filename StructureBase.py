@@ -55,12 +55,8 @@ class Structure:
     def facing(self, value: int):
         self._facing = value % 4
 
-    def isSameType(self, otherStructure: Structure = None):
-        if otherStructure:
-            return otherStructure.structureFile == self.structureFile
-        return False
-
-    def getBox(self) -> Box:
+    @property
+    def box(self) -> Box:
         # noinspection PyTypeChecker
         return Box(
             size=ivec3(
@@ -69,6 +65,22 @@ class Structure:
                 self.structureFile.getSizeZ()
             )
         )
+
+    def isIntersection(self, otherStructure: Structure = None):
+        if otherStructure is None:
+            return False
+        otherStructureBox = otherStructure.box
+        otherStructureBox.offset = otherStructure.position
+        otherStructureBox.erode()
+        currentBox = self.box
+        currentBox.offset = self.position
+        hasIntersection = currentBox.collides(otherStructureBox)
+        return hasIntersection
+
+    def isSameType(self, otherStructure: Structure = None):
+        if otherStructure:
+            return otherStructure.structureFile == self.structureFile
+        return False
 
     def getPreProcessingSteps(self):
         pass
