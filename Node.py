@@ -8,6 +8,7 @@ import globals
 from StructureFolder import StructureFolder
 from gdpc.gdpc.vector_tools import Box
 import vectorTools
+import worldTools
 from StructureBase import Structure
 from structures.debug.narrow_hub.narrow_hub import NarrowHub
 
@@ -29,29 +30,44 @@ class Node:
     ):
         self.rng = rng
         self.parentNode = parentNode
-        self.facing = 0 if facing is None else facing
-        # self.facing = self.rng.integers(4) if facing is None else facing
+        self.facing = self.rng.integers(4) if facing is None else facing
         self.candidateStructures = candidateStructures
 
-        self.selectedStructure = self.selectStructure()
+        self.selectedStructure, self.score = self.selectStructure()
 
         globals.structureCount = globals.structureCount + 1
-        if globals.structureCount < globals.maxStructureCount:
-            # TODO add Node instances to a tree/graph (NetworkX?) instead of placing it right away
-            self.place()
+        # TODO add Node instances to a tree/graph (NetworkX?) instead of placing it right away
+        self.place()
 
-    def selectStructure(self) -> Structure | None:
+    def selectStructure(self) -> tuple[Structure | None, int]:
         if self.parentNode is None:
-            # TODO create empty dummy origin structure class that itself finds a suitable initial position in the world
-            startStructure = NarrowHub(position=globals.buildarea.offset, facing=self.facing)
-            return startStructure
+
+            startPosition = ivec3(
+                globals.buildarea.offset.x + self.rng.choice(globals.buildarea.size.x),
+                0,
+                globals.buildarea.offset.y + self.rng.choice(globals.buildarea.size.y)
+            )
+            startPosition.y = worldTools.getHeightAt(startPosition)
+            # TODO add a list of structures that could be used for the starting node
+            startStructure = NarrowHub(
+                position=startPosition,
+                facing=self.facing
+            )
+
+            startStructureScore = self.evaluateCandidateStructure(startStructure)
+            if startStructureScore > 0:
+                return startStructure, startStructureScore
+            # If starting location is not suitable, attempt to find another starting location.
+            return self.selectStructure()
+
         if len(self.candidateStructures) > 0:
-            structureName = self.rng.choice(self.candidateStructures)
+
+            # Pick random candidateStructure, remove from pool when picked
+            candidateStructureIndex = self.rng.choice(len(self.candidateStructures))
+            structureName = self.candidateStructures.pop(candidateStructureIndex)
+
             if structureName in globals.structureFolders:
                 structureFolder: StructureFolder = globals.structureFolders[structureName]
-                if structureFolder is None:
-                    raise FileNotFoundError(f'Structure file {structureName} does not exist in global collection.')
-
                 # noinspection PyCallingNonCallable
                 selectedStructure: Structure = structureFolder.structureClass(
                     facing=self.facing,
@@ -69,13 +85,25 @@ class Node:
 
                 candidateScore = self.evaluateCandidateStructure(selectedStructure)
                 if candidateScore > 0:
-                    return selectedStructure
-        return None
+                    return selectedStructure, candidateScore
+                # If score is zero, find another candidate structure
+                return self.selectStructure()
+
+        return None, 0
 
     def evaluateCandidateStructure(self, candidateStructure: Structure = None):
         if candidateStructure is None:
             return 0
 
+        # DEBUG Return 0 if there are too many structures.
+        if globals.structureCount > globals.maxStructureCount:
+            return 0
+
+        # Return 0 if structure is outside the build area.
+        if worldTools.isStructureInsideBuildArea(candidateStructure) is False:
+            return 0
+
+        # Return 0 if structure intersects with existing structure.
         if len(globals.nodeList) > 1:
             otherNode: Node
             for otherNode in globals.nodeList:

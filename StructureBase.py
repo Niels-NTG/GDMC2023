@@ -66,14 +66,24 @@ class Structure:
             )
         )
 
+    @property
+    def boxInWorldSpace(self) -> Box:
+        # noinspection PyTypeChecker
+        return Box(
+            offset=self.position,
+            size=ivec3(
+                self.structureFile.getSizeX(),
+                self.structureFile.getSizeY(),
+                self.structureFile.getSizeZ()
+            )
+        )
+
     def isIntersection(self, otherStructure: Structure = None):
         if otherStructure is None:
             return False
-        otherStructureBox = otherStructure.box
-        otherStructureBox.offset = otherStructure.position
+        otherStructureBox = otherStructure.boxInWorldSpace
         otherStructureBox.erode()
-        currentBox = self.box
-        currentBox.offset = self.position
+        currentBox = self.boxInWorldSpace
         hasIntersection = currentBox.collides(otherStructureBox)
         return hasIntersection
 

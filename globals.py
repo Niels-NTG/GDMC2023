@@ -1,10 +1,14 @@
 from pathlib import Path
 
 from gdpc.gdpc import interface
+from gdpc.gdpc import WorldSlice
 from StructureFolder import StructureFolder
 
-global buildarea
 global structureFolders
+
+global buildarea
+global buildareaWorldSlice
+
 global nodeList
 
 # DEBUG
@@ -16,8 +20,12 @@ def initialize():
     global structureFolders
     structureFolders = dict()
     loadStructureFiles()
+
     global buildarea
-    buildarea = interface.getBuildArea()
+    buildarea = interface.getBuildArea().toRect()
+
+    global buildareaWorldSlice
+    buildareaWorldSlice = WorldSlice(rect=buildarea)
 
     global nodeList
     nodeList = []
