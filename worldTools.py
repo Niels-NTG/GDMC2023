@@ -29,7 +29,7 @@ def getHeightAt(pos: ivec3 | ivec2, heightmapType: str = 'MOTION_BLOCKING_NO_LEA
     # fluid (water, lava, or waterlogging blocks), except various leaves. Used only on the server side.
     if isinstance(pos, ivec3):
         pos = ivec2(pos.x, pos.z)
-    heightmap = globals.buildareaWorldSlice.heightmaps[heightmapType]
+    heightmap = globals.editor.worldSlice.heightmaps[heightmapType]
 
-    positionRelativeToWorldSlice = pos - globals.buildareaWorldSlice.rect.offset
+    positionRelativeToWorldSlice = pos - globals.editor.worldSlice.rect.offset
     return heightmap[positionRelativeToWorldSlice.x, positionRelativeToWorldSlice.y]

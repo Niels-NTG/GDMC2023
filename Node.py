@@ -36,8 +36,8 @@ class Node:
         self.selectedStructure, self.score = self.selectStructure()
 
         globals.structureCount = globals.structureCount + 1
-        # TODO add Node instances to a tree/graph (NetworkX?) instead of placing it right away
         self.place()
+        self.createChildNodes()
 
     def selectStructure(self) -> tuple[Structure | None, int]:
         if self.parentNode is None:
@@ -117,30 +117,28 @@ class Node:
     def position(self):
         if self.selectedStructure:
             return self.selectedStructure.position
+        
+    def createChildNodes(self):
+        if self.selectedStructure:
+            for connector in self.selectedStructure.connectors:
+    
+                connectionRotation: int = (connector.get('facing') + self.facing) % 4
+    
+                if self.parentNode and (connector.get('facing') + self.facing + 2) % 4 == self.facing:
+                    continue
+    
+                # Next node
+                Node(
+                    parentNode=self,
+                    facing=connectionRotation,
+                    candidateStructures=connector.get('nextStructure', []),
+                    rng=self.rng,
+                )
 
     def place(self):
-
-        if self.selectedStructure is None:
-            return
-
-        self.selectedStructure.place()
-
-        globals.nodeList.append(self)
-
-        for connector in self.selectedStructure.connectors:
-
-            connectionRotation: int = (connector.get('facing') + self.facing) % 4
-
-            if self.parentNode and (connector.get('facing') + self.facing + 2) % 4 == self.facing:
-                continue
-
-            # Next node
-            Node(
-                parentNode=self,
-                facing=connectionRotation,
-                candidateStructures=connector.get('nextStructure', []),
-                rng=self.rng,
-            )
+        if self.selectedStructure:
+            self.selectedStructure.place()
+            globals.nodeList.append(self)
 
     def __repr__(self):
         return f'{__class__.__name__} {self.selectedStructure}'

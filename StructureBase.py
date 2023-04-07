@@ -92,19 +92,21 @@ class Structure:
             return otherStructure.structureFile == self.structureFile
         return False
 
-    def getPreProcessingSteps(self):
+    def doPreProcessingSteps(self):
         pass
 
     def place(self):
 
+        self.doPreProcessingSteps()
         response = placeStructure(
             self.structureFile.file,
             position=self.position, rotate=self.facing, mirror=None,
             pivot=self.structureFile.getCenterPivot()
         )
         print(f"Placed {self} ({response}) at {self.position} facing {self.facing}")
+        self.doPostProcessingSteps()
 
-    def getPostProcessingSteps(self):
+    def doPostProcessingSteps(self):
         pass
 
     def __repr__(self):

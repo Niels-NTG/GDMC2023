@@ -1,13 +1,13 @@
 from pathlib import Path
 
 from gdpc.gdpc import interface
-from gdpc.gdpc import WorldSlice
+from gdpc.gdpc import Editor
 from StructureFolder import StructureFolder
 
 global structureFolders
 
 global buildarea
-global buildareaWorldSlice
+global editor
 
 global nodeList
 
@@ -23,9 +23,9 @@ def initialize():
 
     global buildarea
     buildarea = interface.getBuildArea().toRect()
-
-    global buildareaWorldSlice
-    buildareaWorldSlice = WorldSlice(rect=buildarea)
+    global editor
+    editor = Editor(multithreading=True, multithreadingWorkers=4)
+    editor.loadWorldSlice(rect=buildarea)
 
     global nodeList
     nodeList = []
