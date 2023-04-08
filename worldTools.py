@@ -10,7 +10,12 @@ def isStructureInsideBuildArea(structure: Structure):
 
 
 def isBoxInsideBuildArea(box: Box):
-    return box.toRect().collides(globals.buildarea)
+    return (
+        box.begin.x >= globals.buildarea.begin.x and
+        box.begin.z >= globals.buildarea.begin.y and
+        box.end.x <= globals.buildarea.end.x and
+        box.end.z <= globals.buildarea.end.y
+    )
 
 
 def getHeightAt(pos: ivec3 | ivec2, heightmapType: str = 'MOTION_BLOCKING_NO_LEAVES'):
