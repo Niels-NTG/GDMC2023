@@ -15,6 +15,7 @@ from structures.debug.narrow_hub.narrow_hub import NarrowHub
 
 class Node:
 
+    score: float
     candidateStructures: list | None
     facing: int | None
     selectedStructure: Structure
@@ -39,7 +40,7 @@ class Node:
         self.place()
         self.createChildNodes()
 
-    def selectStructure(self) -> tuple[Structure | None, int]:
+    def selectStructure(self) -> tuple[Structure | None, float]:
         if self.parentNode is None:
 
             startPosition = ivec3(
@@ -47,7 +48,7 @@ class Node:
                 0,
                 globals.buildarea.offset.y + self.rng.choice(globals.buildarea.size.y)
             )
-            startPosition.y = worldTools.getHeightAt(startPosition)
+            startPosition.y = worldTools.getHeightAt(startPosition) + 3
             # TODO add a list of structures that could be used for the starting node
             startStructure = NarrowHub(
                 position=startPosition,
@@ -91,27 +92,39 @@ class Node:
 
         return None, 0
 
-    def evaluateCandidateStructure(self, candidateStructure: Structure = None):
+    def evaluateCandidateStructure(self, candidateStructure: Structure = None) -> float:
         if candidateStructure is None:
-            return 0
+            return 0.0
 
         # DEBUG Return 0 if there are too many structures.
         if globals.structureCount > globals.maxStructureCount:
-            return 0
+            return 0.0
 
         # Return 0 if structure is outside the build area.
         if worldTools.isStructureInsideBuildArea(candidateStructure) is False:
-            return 0
+            return 0.0
 
         # Return 0 if structure intersects with existing structure.
-        if len(globals.nodeList) > 1:
+        if len(globals.nodeList) > 1.0:
             otherNode: Node
             for otherNode in globals.nodeList:
                 hasIntersection = candidateStructure.isIntersection(otherNode.selectedStructure)
                 if hasIntersection:
-                    return 0
+                    return 0.0
 
-        return 1
+        score = 0.0
+
+        # TODO implement evaluation if structure does not collide with ground level
+        # add part of this logic in StructureBase, such that it can be overriden by
+        # specific structure types when needed.
+
+        # TOOD implement maximum building height cost per structure
+        # eg. structures with support pillars are expensive, without not so much.
+        # Depending on how tall the pillar has to be.
+
+        score += candidateStructure.evaluateStructure()
+
+        return score
 
     @property
     def position(self):
@@ -141,4 +154,4 @@ class Node:
             globals.nodeList.append(self)
 
     def __repr__(self):
-        return f'{__class__.__name__} {self.selectedStructure}'
+        return f'{__class__.__name__} score: {self.score} {self.selectedStructure}'

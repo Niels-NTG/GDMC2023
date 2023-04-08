@@ -18,7 +18,7 @@ def isBoxInsideBuildArea(box: Box):
     )
 
 
-def getHeightAt(pos: ivec3 | ivec2, heightmapType: str = 'MOTION_BLOCKING_NO_LEAVES'):
+def getHeightAt(pos: ivec3 | ivec2, heightmapType: str = 'MOTION_BLOCKING_NO_LEAVES') -> int:
     # WORLD_SURFACE
     # Stores the Y-level of the highest non-air block.
     #
@@ -37,4 +37,4 @@ def getHeightAt(pos: ivec3 | ivec2, heightmapType: str = 'MOTION_BLOCKING_NO_LEA
     heightmap = globals.editor.worldSlice.heightmaps[heightmapType]
 
     positionRelativeToWorldSlice = pos - globals.editor.worldSlice.rect.offset
-    return heightmap[positionRelativeToWorldSlice.x, positionRelativeToWorldSlice.y]
+    return int(heightmap[positionRelativeToWorldSlice.x, positionRelativeToWorldSlice.y])

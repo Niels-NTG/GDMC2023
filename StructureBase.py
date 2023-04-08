@@ -92,11 +92,13 @@ class Structure:
             return otherStructure.structureFile == self.structureFile
         return False
 
+    def evaluateStructure(self) -> float:
+        return 1.0
+
     def doPreProcessingSteps(self):
         pass
 
     def place(self):
-
         self.doPreProcessingSteps()
         response = placeStructure(
             self.structureFile.file,
