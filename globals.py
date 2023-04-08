@@ -24,8 +24,8 @@ def initialize():
     global buildarea
     buildarea = interface.getBuildArea().toRect()
     global editor
-    editor = Editor(multithreading=True, multithreadingWorkers=4)
-    editor.loadWorldSlice(rect=buildarea)
+    editor = Editor()
+    editor.loadWorldSlice(rect=buildarea, cache=True)
 
     global nodeList
     nodeList = []
