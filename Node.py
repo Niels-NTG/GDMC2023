@@ -48,7 +48,7 @@ class Node:
                 0,
                 globals.buildarea.offset.y + self.rng.choice(globals.buildarea.size.y)
             )
-            startPosition.y = worldTools.getHeightAt(startPosition) + 3
+            startPosition.y = worldTools.getHeightAt(startPosition)
             # TODO add a list of structures that could be used for the starting node
             startStructure = NarrowHub(
                 position=startPosition,
@@ -133,7 +133,11 @@ class Node:
         
     def createChildNodes(self):
         if self.selectedStructure:
-            for connector in self.selectedStructure.connectors:
+
+            connectors = np.copy(self.selectedStructure.connectors)
+            self.rng.shuffle(connectors)
+
+            for connector in connectors:
     
                 connectionRotation: int = (connector.get('facing') + self.facing) % 4
     
