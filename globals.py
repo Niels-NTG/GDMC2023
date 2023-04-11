@@ -9,11 +9,9 @@ global structureFolders
 global buildarea
 global editor
 
-global nodeList
+global targetGoldBlockPosition
 
-# DEBUG
-global structureCount
-global maxStructureCount
+global nodeList
 
 
 def initialize():
@@ -29,12 +27,6 @@ def initialize():
 
     global nodeList
     nodeList = []
-
-    # DEBUG
-    global structureCount
-    structureCount = 0
-    global maxStructureCount
-    maxStructureCount = 1200
 
 
 def loadStructureFiles():

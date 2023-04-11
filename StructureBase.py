@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from uuid import uuid4
 
 if TYPE_CHECKING:
     from StructureFolder import StructureFolder
@@ -28,8 +27,6 @@ class Structure:
         position: ivec3,
         facing: int = 0,
     ):
-
-        self.uuid = uuid4()
 
         self.structureFile = structureFolder.structureFile
         self.transitionStructureFiles = structureFolder.transitionStructureFiles
@@ -111,5 +108,11 @@ class Structure:
     def doPostProcessingSteps(self):
         pass
 
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+    def __hash__(self):
+        return hash((self.structureFile, self.position, self.facing))
+
     def __repr__(self):
-        return f'{__class__.__name__} {self.uuid} {self.structureFile}'
+        return f'{__class__.__name__} {self.structureFile} {self.position} {self.facing}'

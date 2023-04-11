@@ -1,161 +1,157 @@
 from __future__ import annotations
+from copy import copy
 
 import numpy as np
-from glm import ivec3
-from numpy.random import Generator
+from glm import ivec3, distance
 
 import globals
-from StructureFolder import StructureFolder
-from gdpc.gdpc.vector_tools import Box
-import vectorTools
-import worldTools
 from StructureBase import Structure
-from structures.debug.narrow_hub.narrow_hub import NarrowHub
+from gdpc.gdpc.vector_tools import Box
+import worldTools
+import vectorTools
 
 
 class Node:
 
+    structure: Structure
     score: float
-    candidateStructures: list | None
-    facing: int | None
-    selectedStructure: Structure
-    rng: Generator
-    parentNode: Node | None
+    rng: np.random.Generator
+    isRoot: bool
 
     def __init__(
         self,
-        parentNode: Node = None,
-        facing: int = None,
-        candidateStructures: list = None,
-        rng=np.random.default_rng(),
+        structure: Structure = None,
+        score: float = 0.0,
+        rng: np.random.Generator = np.random.default_rng(),
+        isRoot: bool = False
     ):
+        self.structure = structure
+        self.score = score
         self.rng = rng
-        self.parentNode = parentNode
-        self.facing = self.rng.integers(4) if facing is None else facing
-        self.candidateStructures = candidateStructures
+        self.isRoot = isRoot
 
-        self.selectedStructure, self.score = self.selectStructure()
+    def place(self):
+        self.structure.place()
 
-        globals.structureCount = globals.structureCount + 1
-        self.place()
-        self.createChildNodes()
+    def distanceToGlobalGoal(self):
+        return distance(globals.targetGoldBlockPosition.to_tuple(), self.structure.boxInWorldSpace.middle.to_tuple())
 
-    def selectStructure(self) -> tuple[Structure | None, float]:
-        if self.parentNode is None:
-
-            startPosition = ivec3(
-                globals.buildarea.offset.x + self.rng.choice(globals.buildarea.size.x),
-                0,
-                globals.buildarea.offset.y + self.rng.choice(globals.buildarea.size.y)
-            )
-            startPosition.y = worldTools.getHeightAt(startPosition)
-            # TODO add a list of structures that could be used for the starting node
-            startStructure = NarrowHub(
-                position=startPosition,
-                facing=self.facing
-            )
-
-            startStructureScore = self.evaluateCandidateStructure(startStructure)
-            if startStructureScore > 0:
-                return startStructure, startStructureScore
-            # If starting location is not suitable, attempt to find another starting location.
-            return self.selectStructure()
-
-        if len(self.candidateStructures) > 0:
-
-            # Pick random candidateStructure, remove from pool when picked
-            candidateStructureIndex = self.rng.choice(len(self.candidateStructures))
-            structureName = self.candidateStructures.pop(candidateStructureIndex)
-
-            if structureName in globals.structureFolders:
-                structureFolder: StructureFolder = globals.structureFolders[structureName]
-                # noinspection PyCallingNonCallable
-                selectedStructure: Structure = structureFolder.structureClass(
-                    facing=self.facing,
-                    position=ivec3(0, 0, 0)
-                )
-
-                parentStructureBox: Box = self.parentNode.selectedStructure.box
-                selectedStructureBox: Box = selectedStructure.box
-                nextPosition = vectorTools.getNextPosition(
-                    facing=self.facing,
-                    currentBox=parentStructureBox,
-                    nextBox=selectedStructureBox
-                ) + self.parentNode.selectedStructure.position
-                selectedStructure.position = nextPosition
-
-                candidateScore = self.evaluateCandidateStructure(selectedStructure)
-                if candidateScore > 0:
-                    return selectedStructure, candidateScore
-                # If score is zero, find another candidate structure
-                return self.selectStructure()
-
-        return None, 0
-
-    def evaluateCandidateStructure(self, candidateStructure: Structure = None) -> float:
+    @staticmethod
+    def evaluateCandidateNextStructure(candidateStructure: Structure = None) -> float:
         if candidateStructure is None:
             return 0.0
 
-        # DEBUG Return 0 if there are too many structures.
-        if globals.structureCount > globals.maxStructureCount:
-            return 0.0
-
-        # Return 0 if structure is outside the build area.
         if worldTools.isStructureInsideBuildArea(candidateStructure) is False:
             return 0.0
 
-        # Return 0 if structure intersects with existing structure.
-        if len(globals.nodeList) > 1.0:
-            otherNode: Node
-            for otherNode in globals.nodeList:
-                hasIntersection = candidateStructure.isIntersection(otherNode.selectedStructure)
-                if hasIntersection:
-                    return 0.0
+        # TODO Check if this needs to be adjusted to account for MCTS back prop
+        # if len(globals.nodeList) > 1:
+        #     otherNode: Node
+        #     for otherNode in globals.nodeList:
+        #         hasIntersection = candidateStructure.isIntersection(otherNode.structure)
+        #         if hasIntersection:
+        #             return 0.0
 
         score = 0.0
-
-        # TODO implement evaluation if structure does not collide with ground level
-        # add part of this logic in StructureBase, such that it can be overriden by
-        # specific structure types when needed.
-
-        # TOOD implement maximum building height cost per structure
-        # eg. structures with support pillars are expensive, without not so much.
-        # Depending on how tall the pillar has to be.
 
         score += candidateStructure.evaluateStructure()
 
         return score
 
-    @property
-    def position(self):
-        if self.selectedStructure:
-            return self.selectedStructure.position
-        
-    def createChildNodes(self):
-        if self.selectedStructure:
+    @staticmethod
+    def getCurrentPlayer():
+        return -1
 
-            connectors = np.copy(self.selectedStructure.connectors)
-            self.rng.shuffle(connectors)
+    def getPossibleActions(self) -> list[Action]:
+        possibleActions = []
 
-            for connector in connectors:
-    
-                connectionRotation: int = (connector.get('facing') + self.facing) % 4
-    
-                if self.parentNode and (connector.get('facing') + self.facing + 2) % 4 == self.facing:
+        connectors = copy(self.structure.connectors)
+        self.rng.shuffle(connectors)
+        for connector in connectors:
+
+            connectionRotation: int = (connector.get('facing') + self.structure.facing) % 4
+
+            # Check if slot for this face isn't occupied by the parent node structure
+            if self.isRoot is False and \
+                    (connector.get('facing') + self.structure.facing + 2) % 4 == self.structure.facing:
+                continue
+            # TODO check if slot is not already taken by other nodes
+
+            nextStructures = connector.get('nextStructure', [])
+            self.rng.shuffle(nextStructures)
+            for candidateStructureName in nextStructures:
+                if candidateStructureName not in globals.structureFolders:
                     continue
-    
-                # Next node
-                Node(
-                    parentNode=self,
+                structureFolder = globals.structureFolders[candidateStructureName]
+                # noinspection PyCallingNonCallable
+                candidateStructure: Structure = structureFolder.structureClass(
                     facing=connectionRotation,
-                    candidateStructures=connector.get('nextStructure', []),
-                    rng=self.rng,
+                    position=ivec3(0, 0, 0)
                 )
 
-    def place(self):
-        if self.selectedStructure:
-            self.selectedStructure.place()
-            globals.nodeList.append(self)
+                currentStructureBox: Box = self.structure.box
+                selectedStructureBox: Box = candidateStructure.box
+                nextPosition = vectorTools.getNextPosition(
+                    facing=connectionRotation,
+                    currentBox=currentStructureBox,
+                    nextBox=selectedStructureBox
+                ) + self.structure.position
+                candidateStructure.position = nextPosition
+
+                candidateStructureScore = self.evaluateCandidateNextStructure(candidateStructure)
+                if candidateStructureScore > 0:
+                    possibleActions.append(Action(
+                        structure=candidateStructure,
+                        score=candidateStructureScore,
+                    ))
+
+        return possibleActions
+
+    def takeAction(self, action: Action):
+        return Node(
+            structure=action.structure,
+            score=action.score,
+            rng=self.rng,
+        )
+
+    def isTerminal(self):
+        if self.distanceToGlobalGoal() < 10:
+            return True
+        if len(self.getPossibleActions()) == 0:
+            return True
+        return False
+
+    def getReward(self):
+        # only needed for terminal states
+        # return self.score
+        # return 0 - self.distanceToGlobalGoal()
+        return self.distanceToGlobalGoal()
+
+    def __hash__(self):
+        return hash(self.structure)
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
 
     def __repr__(self):
-        return f'{__class__.__name__} score: {self.score} {self.selectedStructure}'
+        return f'{__class__.__name__} {self.distanceToGlobalGoal()} {self.structure}'
+
+
+class Action:
+
+    def __init__(
+        self,
+        structure: Structure = None,
+        score: float = 0.0,
+    ):
+        self.structure = structure
+        self.score = score
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+    def __hash__(self):
+        return hash((self.structure, self.score))
+
+    def __repr__(self):
+        return f'{__class__.__name__} {self.score} {self.structure}'
