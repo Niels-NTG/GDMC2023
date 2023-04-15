@@ -1,5 +1,5 @@
 import numpy as np
-from glm import ivec2
+from glm import ivec2, ivec3
 
 import MCTS.mcts
 from MCTS.mcts import mcts
@@ -13,10 +13,10 @@ from structures.debug.narrow_hub.narrow_hub import NarrowHub
 
 globals.initialize()
 
-rng = np.random.default_rng(12119989202)
+rng = np.random.default_rng(89882891298231221009756)
 
 buildarea = globals.buildarea
-for y in range(0, 7):
+for y in range(63, 70):
     globals.editor.runCommandGlobal(
         f'fill {buildarea.begin.x} {y} {buildarea.begin.y} {buildarea.last.x} {y} {buildarea.last.y} minecraft:air',
 
@@ -57,8 +57,9 @@ globals.editor.placeBlock(
 
 rootStructure = NarrowHub(
     facing=rng.integers(4),
-    position=worldTools.getRandomSurfacePosition(rng=rng),
+    position=ivec3(0, 0, 0)
 )
+rootStructure.position = worldTools.getRandomSurfacePositionForBox(box=rootStructure.box, rng=rng)
 rootNode = Node(
     structure=rootStructure,
     rng=rng,
@@ -69,7 +70,19 @@ rootNode = Node(
 def mctsRolloutPolicy(state: Node):
     while not state.isTerminal():
         try:
-            selectedAction = rng.choice(state.getPossibleActions())
+            actions = state.getPossibleActions()
+            if len(actions) > 1:
+                # Bias actions towards lower costs structures
+                actionCostSum = sum(actions)
+                weights = []
+                for action in actions:
+                    weights.append(
+                        1 - (action.cost / actionCostSum)
+                    )
+                weights = weights / np.sum(weights)
+                selectedAction = rng.choice(actions, p=weights)
+            else:
+                selectedAction = actions[0]
         except IndexError:
             raise Exception(f'Non-terminal state has no possible actions: {state}')
         state = state.takeAction(selectedAction)
@@ -77,7 +90,7 @@ def mctsRolloutPolicy(state: Node):
 
 
 searcher = mcts(iterationLimit=100000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
-action = searcher.search(initialState=rootNode)
+searcher.search(initialState=rootNode)
 
 
 def buildFoundTrace(treeNode: MCTS.mcts.treeNode):

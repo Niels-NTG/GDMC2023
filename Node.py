@@ -14,19 +14,19 @@ import vectorTools
 class Node:
 
     structure: Structure
-    score: float
+    cost: float
     rng: np.random.Generator
     isRoot: bool
 
     def __init__(
         self,
         structure: Structure = None,
-        score: float = 0.0,
+        cost: float = 0.0,
         rng: np.random.Generator = np.random.default_rng(),
         isRoot: bool = False
     ):
         self.structure = structure
-        self.score = score
+        self.cost = cost
         self.rng = rng
         self.isRoot = isRoot
 
@@ -52,11 +52,11 @@ class Node:
         #         if hasIntersection:
         #             return 0.0
 
-        score = 0.0
+        cost = 0.0
 
-        score += candidateStructure.evaluateStructure()
+        cost += candidateStructure.evaluateStructure()
 
-        return score
+        return cost
 
     @staticmethod
     def getCurrentPlayer():
@@ -98,11 +98,11 @@ class Node:
                 ) + self.structure.position
                 candidateStructure.position = nextPosition
 
-                candidateStructureScore = self.evaluateCandidateNextStructure(candidateStructure)
-                if candidateStructureScore > 0:
+                candidateStructureCost = self.evaluateCandidateNextStructure(candidateStructure)
+                if candidateStructureCost > 0:
                     possibleActions.append(Action(
                         structure=candidateStructure,
-                        score=candidateStructureScore,
+                        cost=candidateStructureCost,
                     ))
 
         return possibleActions
@@ -110,7 +110,7 @@ class Node:
     def takeAction(self, action: Action):
         return Node(
             structure=action.structure,
-            score=action.score,
+            cost=action.cost,
             rng=self.rng,
         )
 
@@ -123,7 +123,7 @@ class Node:
 
     def getReward(self):
         # only needed for terminal states
-        # return self.score
+        # return self.cost
         # return 0 - self.distanceToGlobalGoal()
         return self.distanceToGlobalGoal()
 
@@ -142,16 +142,24 @@ class Action:
     def __init__(
         self,
         structure: Structure = None,
-        score: float = 0.0,
+        cost: float = 0.0,
     ):
         self.structure = structure
-        self.score = score
+        self.cost = cost
+
+    def __add__(self, other):
+        if isinstance(other, Action):
+            return self.cost + other.cost
+        return self.cost + other
+
+    def __radd__(self, other):
+        return self + other
 
     def __eq__(self, other):
         return hash(self) == hash(other)
 
     def __hash__(self):
-        return hash((self.structure, self.score))
+        return hash((self.structure, self.cost))
 
     def __repr__(self):
-        return f'{__class__.__name__} {self.score} {self.structure}'
+        return f'{__class__.__name__} {self.cost} {self.structure}'
