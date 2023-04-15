@@ -59,3 +59,14 @@ def getRandomSurfacePosition(rng=np.random.default_rng(), heightmapType: str = '
     )
     startPosition.y = getHeightAt(startPosition, heightmapType=heightmapType)
     return startPosition
+
+
+def getRandomSurfacePositionForBox(box: Box, rng=np.random.default_rng(), heightmapType: str = 'MOTION_BLOCKING_NO_LEAVES') -> ivec3:
+    box = Box(box.offset, box.size)
+    MAX_ATTEMPTS = 128
+    for _ in range(MAX_ATTEMPTS):
+        pos = getRandomSurfacePosition(rng, heightmapType)
+        box.offset = pos
+        if isBoxInsideBuildArea(box):
+            return pos
+    raise Exception('Could not fit box inside build area')
