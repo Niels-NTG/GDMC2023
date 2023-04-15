@@ -13,17 +13,16 @@ from structures.debug.narrow_hub.narrow_hub import NarrowHub
 
 globals.initialize()
 
-rng = np.random.default_rng(89882891298231221009756)
+rng = np.random.default_rng(444992827400221123)
 
-buildarea = globals.buildarea
-for y in range(63, 70):
+for y in range(0, 7):
     globals.editor.runCommandGlobal(
-        f'fill {buildarea.begin.x} {y} {buildarea.begin.y} {buildarea.last.x} {y} {buildarea.last.y} minecraft:air',
+        f'fill {globals.buildarea.begin.x} {y} {globals.buildarea.begin.y} {globals.buildarea.last.x} {y} {globals.buildarea.last.y} minecraft:air',
 
     )
 globals.editor.runCommandGlobal('kill @e[type=item]')
 
-globals.editor.loadWorldSlice(rect=buildarea, cache=True)
+globals.editor.loadWorldSlice(rect=globals.buildarea, cache=True)
 
 globals.targetGoldBlockPosition = worldTools.getRandomSurfacePosition(rng=rng)
 globals.editor.placeBlock(
