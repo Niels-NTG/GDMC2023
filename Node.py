@@ -44,6 +44,10 @@ class Node:
         if worldTools.isStructureInsideBuildArea(candidateStructure) is False:
             return 0.0
 
+        centerPoint = candidateStructure.boxInWorldSpace.middle
+        if worldTools.getHeightAt(centerPoint) > centerPoint.y:
+            return 0.0
+
         # TODO Check if this needs to be adjusted to account for MCTS back prop
         # if len(globals.nodeList) > 1:
         #     otherNode: Node
@@ -115,7 +119,7 @@ class Node:
         )
 
     def isTerminal(self):
-        if self.distanceToGlobalGoal() < 10:
+        if self.distanceToGlobalGoal() < 4:
             return True
         if len(self.getPossibleActions()) == 0:
             return True

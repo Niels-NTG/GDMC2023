@@ -97,6 +97,7 @@ class Structure:
 
     def place(self):
         self.doPreProcessingSteps()
+        # noinspection PyTypeChecker
         response = placeStructure(
             self.structureFile.file,
             position=self.position, rotate=self.facing, mirror=None,
