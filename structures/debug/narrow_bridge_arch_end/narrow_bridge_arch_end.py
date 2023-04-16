@@ -43,9 +43,12 @@ class NarrowBridgeArchEnd(StructureBase):
         score = super().evaluateStructure()
 
         bridgeStart = self.getPillarBox()
-        pillarHeight = self.position.y - worldTools.getHeightAt(pos=bridgeStart.middle, heightmapType='OCEAN_FLOOR')
-        if pillarHeight < 0:
-            # If pillar cost is negative, do not built underground
+        try:
+            pillarHeight = self.position.y - worldTools.getHeightAt(pos=bridgeStart.middle, heightmapType='OCEAN_FLOOR')
+            if pillarHeight < 0:
+                # If pillar cost is negative, do not built underground
+                return 0.0
+        except:
             return 0.0
         pillarCost = pow(pillarHeight, 1.22)
 
@@ -69,7 +72,7 @@ class NarrowBridgeArchEnd(StructureBase):
     def getPillarBox(self):
         # from x:2, z:1, size 5, 3
         # noinspection PyTypeChecker
-        pillarBox = Box(offset=ivec3(2, 0, 1), size=ivec3(3, 0, 5))
+        pillarBox = Box(offset=ivec3(2, 0, 0), size=ivec3(3, 0, 5))
         pillarBox.offset.x = self.structureFile.getSizeX() - (pillarBox.offset.x + pillarBox.size.x)
 
         if self.facing > 0:
