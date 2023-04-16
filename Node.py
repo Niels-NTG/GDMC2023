@@ -44,8 +44,7 @@ class Node:
         if worldTools.isStructureInsideBuildArea(candidateStructure) is False:
             return 0.0
 
-        centerPoint = candidateStructure.boxInWorldSpace.middle
-        if worldTools.getHeightAt(centerPoint) >= centerPoint.y:
+        if worldTools.isStructureTouchingSurface(candidateStructure):
             return 0.0
 
         # TODO Check if this needs to be adjusted to account for MCTS back prop

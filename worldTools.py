@@ -3,7 +3,10 @@ from glm import ivec2, ivec3
 
 import globals
 from StructureBase import Structure
-from gdpc.gdpc.vector_tools import Box
+from gdpc.gdpc.vector_tools import Box, loop2D
+
+
+DEFAULT_HEIGHTMAP_TYPE: str = 'MOTION_BLOCKING_NO_LEAVES'
 
 
 def isStructureInsideBuildArea(structure: Structure) -> bool:
@@ -19,7 +22,28 @@ def isBoxInsideBuildArea(box: Box) -> bool:
     )
 
 
-def getHeightAt(pos: ivec3 | ivec2, heightmapType: str = 'MOTION_BLOCKING_NO_LEAVES') -> int:
+def isStructureTouchingSurface(
+    structure: Structure,
+    heightmapType: str = DEFAULT_HEIGHTMAP_TYPE
+) -> bool:
+    return isBoxTouchingSurface(box=structure.boxInWorldSpace, heightmapType=heightmapType)
+
+
+def isBoxTouchingSurface(
+    box: Box,
+    heightmapType: str = DEFAULT_HEIGHTMAP_TYPE
+) -> bool:
+    floorRect = box.toRect()
+    for point in loop2D(floorRect.begin, floorRect.end):
+        if getHeightAt(pos=point, heightmapType=heightmapType) > box.offset.y:
+            return True
+    return False
+
+
+def getHeightAt(
+    pos: ivec3 | ivec2,
+    heightmapType: str = DEFAULT_HEIGHTMAP_TYPE
+) -> int:
     # WORLD_SURFACE
     # Stores the Y-level of the highest non-air block.
     #
@@ -41,7 +65,10 @@ def getHeightAt(pos: ivec3 | ivec2, heightmapType: str = 'MOTION_BLOCKING_NO_LEA
     return int(heightmap[positionRelativeToWorldSlice.x, positionRelativeToWorldSlice.y])
 
 
-def getSurfacePositionAt(pos: ivec3 | ivec2, heightmapType: str = 'MOTION_BLOCKING_NO_LEAVES') -> ivec3:
+def getSurfacePositionAt(
+    pos: ivec3 | ivec2,
+    heightmapType: str = DEFAULT_HEIGHTMAP_TYPE
+) -> ivec3:
     if isinstance(pos, ivec3):
         pos = ivec2(pos.x, pos.z)
     return ivec3(
@@ -51,7 +78,10 @@ def getSurfacePositionAt(pos: ivec3 | ivec2, heightmapType: str = 'MOTION_BLOCKI
     )
 
 
-def getRandomSurfacePosition(rng=np.random.default_rng(), heightmapType: str = 'MOTION_BLOCKING_NO_LEAVES') -> ivec3:
+def getRandomSurfacePosition(
+    rng=np.random.default_rng(),
+    heightmapType: str = DEFAULT_HEIGHTMAP_TYPE
+) -> ivec3:
     startPosition = ivec3(
         globals.buildarea.offset.x + rng.choice(globals.buildarea.size.x),
         0,
@@ -61,7 +91,11 @@ def getRandomSurfacePosition(rng=np.random.default_rng(), heightmapType: str = '
     return startPosition
 
 
-def getRandomSurfacePositionForBox(box: Box, rng=np.random.default_rng(), heightmapType: str = 'MOTION_BLOCKING_NO_LEAVES') -> ivec3:
+def getRandomSurfacePositionForBox(
+    box: Box,
+    rng=np.random.default_rng(),
+    heightmapType: str = DEFAULT_HEIGHTMAP_TYPE
+) -> ivec3:
     box = Box(box.offset, box.size)
     MAX_ATTEMPTS = 128
     for _ in range(MAX_ATTEMPTS):

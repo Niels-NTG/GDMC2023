@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 from glm import ivec3
 
 from gdpc.gdpc.interface import placeStructure
-from gdpc.gdpc.vector_tools import Box
+from gdpc.gdpc.vector_tools import Box, Rect
 
 
 class Structure:
@@ -74,6 +74,14 @@ class Structure:
                 self.structureFile.getSizeZ()
             )
         )
+
+    @property
+    def rect(self) -> Rect:
+        return self.box.toRect()
+
+    @property
+    def rectInWorldSpace(self) -> Rect:
+        return self.boxInWorldSpace.toRect()
 
     def isIntersection(self, otherStructure: Structure = None):
         if otherStructure is None:
