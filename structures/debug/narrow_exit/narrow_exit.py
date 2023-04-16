@@ -19,7 +19,7 @@ class NarrowExit(StructureBase):
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
-            facing=facing
+            facing=facing,
         )
         self.connectors = [
             {
@@ -27,7 +27,9 @@ class NarrowExit(StructureBase):
                 'nextStructure': [
                     'narrow_hub',
                     'narrow_hallway',
-                    'narrow_short_bridge'
+                    'narrow_short_bridge',
+                    'narrow_short_bridge_stairs_up',
+                    'narrow_short_bridge_stairs_down',
                 ]
             }
         ]

@@ -10,8 +10,8 @@ def getNextPosition(facing: int = 0, currentBox: Box = None, nextBox: Box = None
     if nextBox is None:
         nextBox = Box()
 
-    currentCenter = ivec3(currentBox.center.x, 0, currentBox.center.z)
-    nextCenter = ivec3(currentBox.size.x + nextBox.center.x, 0, currentCenter.z)
+    currentCenter = ivec3(currentBox.center.x, currentBox.offset.y, currentBox.center.z)
+    nextCenter = ivec3(currentBox.size.x + nextBox.center.x, nextBox.offset.y, currentCenter.z)
     nextPoint = rotatePointAroundOrigin(
         origin=currentCenter,
         point=nextCenter,

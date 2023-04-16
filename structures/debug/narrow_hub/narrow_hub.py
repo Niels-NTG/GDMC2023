@@ -19,7 +19,7 @@ class NarrowHub(Structure):
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
-            facing=facing
+            facing=facing,
         )
         self.connectors = [
             {
@@ -27,7 +27,9 @@ class NarrowHub(Structure):
                 'nextStructure': [
                     'narrow_hallway',
                     'narrow_exit',
-                    'narrow_short_bridge'
+                    'narrow_short_bridge',
+                    'narrow_short_bridge_stairs_up',
+                    'narrow_short_bridge_stairs_down',
                 ]
             },
             {
@@ -35,7 +37,9 @@ class NarrowHub(Structure):
                 'nextStructure': [
                     'narrow_hallway',
                     'narrow_exit',
-                    'narrow_short_bridge'
+                    'narrow_short_bridge',
+                    'narrow_short_bridge_stairs_up',
+                    'narrow_short_bridge_stairs_down',
                 ]
             },
             {
@@ -43,7 +47,9 @@ class NarrowHub(Structure):
                 'nextStructure': [
                     'narrow_hallway',
                     'narrow_exit',
-                    'narrow_short_bridge'
+                    'narrow_short_bridge',
+                    'narrow_short_bridge_stairs_up',
+                    'narrow_short_bridge_stairs_down',
                 ]
             },
             {
@@ -51,7 +57,9 @@ class NarrowHub(Structure):
                 'nextStructure': [
                     'narrow_hallway',
                     'narrow_exit',
-                    'narrow_short_bridge'
+                    'narrow_short_bridge',
+                    'narrow_short_bridge_stairs_up',
+                    'narrow_short_bridge_stairs_down',
                 ]
             }
         ]

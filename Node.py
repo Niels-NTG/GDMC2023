@@ -45,7 +45,7 @@ class Node:
             return 0.0
 
         centerPoint = candidateStructure.boxInWorldSpace.middle
-        if worldTools.getHeightAt(centerPoint) > centerPoint.y:
+        if worldTools.getHeightAt(centerPoint) >= centerPoint.y:
             return 0.0
 
         # TODO Check if this needs to be adjusted to account for MCTS back prop
@@ -81,6 +81,8 @@ class Node:
                 continue
             # TODO check if slot is not already taken by other nodes
 
+            connectionOffset = connector.get('offset', ivec3(0, 0, 0))
+
             nextStructures = connector.get('nextStructure', [])
             self.rng.shuffle(nextStructures)
             for candidateStructureName in nextStructures:
@@ -90,17 +92,17 @@ class Node:
                 # noinspection PyCallingNonCallable
                 candidateStructure: Structure = structureFolder.structureClass(
                     facing=connectionRotation,
-                    position=ivec3(0, 0, 0)
+                    position=ivec3(0, 0, 0),
                 )
 
                 currentStructureBox: Box = self.structure.box
-                selectedStructureBox: Box = candidateStructure.box
+                candidateStructureBox: Box = candidateStructure.box
                 nextPosition = vectorTools.getNextPosition(
                     facing=connectionRotation,
                     currentBox=currentStructureBox,
-                    nextBox=selectedStructureBox
+                    nextBox=candidateStructureBox
                 ) + self.structure.position
-                candidateStructure.position = nextPosition
+                candidateStructure.position = nextPosition + connectionOffset
 
                 candidateStructureCost = self.evaluateCandidateNextStructure(candidateStructure)
                 if candidateStructureCost > 0:

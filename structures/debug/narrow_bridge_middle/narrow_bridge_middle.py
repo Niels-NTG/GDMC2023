@@ -17,7 +17,7 @@ class NarrowBridgeMiddle(StructureBase):
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
-            facing=facing
+            facing=facing,
         )
         self.connectors = [
             {

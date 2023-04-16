@@ -19,21 +19,25 @@ class NarrowHallway(StructureBase):
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
-            facing=facing
+            facing=facing,
         )
         self.connectors = [
             {
                 'facing': 0,
                 'nextStructure': [
                     'narrow_short_bridge',
-                    'narrow_exit'
+                    'narrow_exit',
+                    'narrow_short_bridge_stairs_up',
+                    'narrow_short_bridge_stairs_down',
                 ]
             },
             {
                 'facing': 2,
                 'nextStructure': [
                     'narrow_short_bridge',
-                    'narrow_exit'
+                    'narrow_exit',
+                    'narrow_short_bridge_stairs_up',
+                    'narrow_short_bridge_stairs_down',
                 ]
             }
         ]
