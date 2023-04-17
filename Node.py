@@ -17,6 +17,7 @@ class Node:
     cost: float
     rng: np.random.Generator
     isRoot: bool
+    possibleActions: list[Action] | None
 
     def __init__(
         self,
@@ -29,6 +30,8 @@ class Node:
         self.cost = cost
         self.rng = rng
         self.isRoot = isRoot
+
+        self.possibleActions = None
 
     def place(self):
         self.structure.place()
@@ -62,10 +65,12 @@ class Node:
         return cost
 
     @staticmethod
-    def getCurrentPlayer():
+    def getCurrentPlayer() -> int:
         return -1
 
     def getPossibleActions(self) -> list[Action]:
+        if self.possibleActions is not None:
+            return self.possibleActions
         possibleActions = []
 
         connectors = copy(self.structure.connectors)
@@ -110,6 +115,7 @@ class Node:
                         cost=candidateStructureCost,
                     ))
 
+        self.possibleActions = possibleActions
         return possibleActions
 
     def takeAction(self, action: Action):
