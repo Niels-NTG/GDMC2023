@@ -30,54 +30,66 @@ class StructureFile:
 
     # Get block properties (also known as block states: https://minecraft.fandom.com/wiki/Block_states) of a block.
     # This may contain information on the orientation of a block or open or closed stated of a door.
-    def getBlockProperties(self, block):
+    def getBlockProperties(self, block) -> dict:
         properties = dict()
         if "Properties" in self.nbt["palette"][block["state"].value].keys():
             for key in self.nbt["palette"][block["state"].value]["Properties"].keys():
                 properties[key] = self.nbt["palette"][block["state"].value]["Properties"][key].value
         return properties
 
-    def getBlockPropertiesAt(self, x, y, z):
+    def getBlockPropertiesAt(self, x, y, z) -> dict:
         return self.getBlockProperties(self.getBlockAt(x, y, z))
 
-    def getSizeX(self):
+    @property
+    def sizeX(self) -> int:
         return self.nbt["size"][0].value
 
-    def getSizeY(self):
+    @property
+    def sizeY(self) -> int:
         return self.nbt["size"][1].value
 
-    def getSizeZ(self):
+    @property
+    def sizeZ(self) -> int:
         return self.nbt["size"][2].value
 
-    def getShortestDimension(self):
-        return np.argmin([np.abs(self.getSizeX()), np.abs(self.getSizeY()), np.abs(self.getSizeZ())])
+    @property
+    def shortestDimension(self):
+        return np.argmin([np.abs(self.sizeX), np.abs(self.sizeY), np.abs(self.sizeZ)])
 
-    def getLongestDimension(self):
-        return np.argmax([np.abs(self.getSizeX()), np.abs(self.getSizeY()), np.abs(self.getSizeZ())])
+    @property
+    def longestDimension(self):
+        return np.argmax([np.abs(self.sizeX), np.abs(self.sizeY), np.abs(self.sizeZ)])
 
-    def getShortestHorizontalDimension(self):
-        return np.argmin([np.abs(self.getSizeX()), np.abs(self.getSizeZ())]) * 2
+    @property
+    def shortestHorizontalDimension(self) -> int:
+        return np.argmin([np.abs(self.sizeX), np.abs(self.sizeZ)]) * 2
 
-    def getLongestHorizontalDimension(self):
-        return np.argmax([np.abs(self.getSizeX()), np.abs(self.getSizeZ())]) * 2
+    @property
+    def longestHorizontalDimension(self) -> int:
+        return np.argmax([np.abs(self.sizeX), np.abs(self.sizeZ)]) * 2
 
-    def getShortestSize(self):
-        return [self.getSizeX(), self.getSizeY(), self.getSizeZ()][self.getShortestDimension()]
+    @property
+    def shortestSize(self) -> int:
+        return [self.sizeX, self.sizeY, self.sizeZ][self.shortestDimension]
 
-    def getLongestSize(self):
-        return [self.getSizeX(), self.getSizeY(), self.getSizeZ()][self.getLongestDimension()]
+    @property
+    def longestSize(self) -> int:
+        return [self.sizeX, self.sizeY, self.sizeZ][self.longestDimension]
 
-    def getShortestHorizontalSize(self):
-        return [self.getSizeX(), 0, self.getSizeZ()][self.getShortestHorizontalDimension()]
+    @property
+    def shortestHorizontalSize(self) -> int:
+        return [self.sizeX, 0, self.sizeZ][self.shortestHorizontalDimension]
 
-    def getLongestHorizontalSize(self):
-        return [self.getSizeX(), 0, self.getSizeZ()][self.getLongestHorizontalDimension()]
+    @property
+    def longestHorizontalSize(self) -> int:
+        return [self.sizeX, 0, self.sizeZ][self.longestHorizontalDimension]
 
-    def getCenterPivot(self) -> ivec3:
+    @property
+    def centerPivot(self) -> ivec3:
         return ivec3(
-            self.getSizeX() // 2,
+            self.sizeX // 2,
             0,
-            self.getSizeZ() // 2
+            self.sizeZ // 2
         )
 
     def __repr__(self):

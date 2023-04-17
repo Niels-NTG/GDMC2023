@@ -77,12 +77,12 @@ class NarrowBridgeArchStart(StructureBase):
         if self.facing > 0:
             offset = vectorTools.rotatePointAroundOrigin(
                 point=pillarBox.offset,
-                origin=self.structureFile.getCenterPivot(),
+                origin=self.structureFile.centerPivot,
                 rotation=self.facing
             )
             size = vectorTools.rotatePointAroundOrigin(
                 point=pillarBox.end,
-                origin=self.structureFile.getCenterPivot(),
+                origin=self.structureFile.centerPivot,
                 rotation=self.facing
             )
             # noinspection PyTypeChecker

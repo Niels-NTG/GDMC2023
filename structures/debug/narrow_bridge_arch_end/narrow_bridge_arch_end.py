@@ -73,17 +73,17 @@ class NarrowBridgeArchEnd(StructureBase):
         # from x:2, z:1, size 5, 3
         # noinspection PyTypeChecker
         pillarBox = Box(offset=ivec3(2, 0, 0), size=ivec3(3, 0, 5))
-        pillarBox.offset.x = self.structureFile.getSizeX() - (pillarBox.offset.x + pillarBox.size.x)
+        pillarBox.offset.x = self.structureFile.sizeX - (pillarBox.offset.x + pillarBox.size.x)
 
         if self.facing > 0:
             offset = vectorTools.rotatePointAroundOrigin(
                 point=pillarBox.offset,
-                origin=self.structureFile.getCenterPivot(),
+                origin=self.structureFile.centerPivot,
                 rotation=self.facing
             )
             size = vectorTools.rotatePointAroundOrigin(
                 point=pillarBox.end,
-                origin=self.structureFile.getCenterPivot(),
+                origin=self.structureFile.centerPivot,
                 rotation=self.facing
             )
             # noinspection PyTypeChecker

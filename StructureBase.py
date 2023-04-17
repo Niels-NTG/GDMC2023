@@ -57,9 +57,9 @@ class Structure:
         # noinspection PyTypeChecker
         return Box(
             size=ivec3(
-                self.structureFile.getSizeX(),
-                self.structureFile.getSizeY(),
-                self.structureFile.getSizeZ()
+                self.structureFile.sizeX,
+                self.structureFile.sizeY,
+                self.structureFile.sizeZ
             )
         )
 
@@ -69,9 +69,9 @@ class Structure:
         return Box(
             offset=self.position,
             size=ivec3(
-                self.structureFile.getSizeX(),
-                self.structureFile.getSizeY(),
-                self.structureFile.getSizeZ()
+                self.structureFile.sizeX,
+                self.structureFile.sizeY,
+                self.structureFile.sizeZ
             )
         )
 
@@ -109,7 +109,7 @@ class Structure:
         response = placeStructure(
             self.structureFile.file,
             position=self.position, rotate=self.facing, mirror=None,
-            pivot=self.structureFile.getCenterPivot()
+            pivot=self.structureFile.centerPivot
         )
         print(f"Placed {self} ({response}) at {self.position} facing {self.facing}")
         self.doPostProcessingSteps()
