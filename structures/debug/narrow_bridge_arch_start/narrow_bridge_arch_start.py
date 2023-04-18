@@ -7,6 +7,7 @@ import globals
 import vectorTools
 import worldTools
 from StructureBase import Structure as StructureBase
+from Connector import Connector
 from gdpc.gdpc.block import Block
 from gdpc.gdpc.vector_tools import Box, loop2D
 
@@ -17,26 +18,28 @@ class NarrowBridgeArchStart(StructureBase):
         self,
         position: Optional[ivec3],
         facing: int = 0,
+        connectorId: int = None,
     ):
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
             facing=facing,
+            connectorId=connectorId,
         )
         self.connectors = [
-            {
-                'facing': 0,
-                'nextStructure': [
+            Connector(
+                facing=0,
+                nextStructure=[
                     'narrow_bridge_middle',
                     'narrow_bridge_arch_end'
                 ]
-            },
-            {
-                'facing': 2,
-                'nextStructure': [
+            ),
+            Connector(
+                facing=2,
+                nextStructure=[
                     'narrow_short_bridge'
                 ]
-            }
+            )
         ]
 
     def evaluateStructure(self) -> float:

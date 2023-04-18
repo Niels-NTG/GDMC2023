@@ -62,7 +62,6 @@ rootStructure.position = worldTools.getRandomSurfacePositionForBox(box=rootStruc
 rootNode = Node(
     structure=rootStructure,
     rng=rng,
-    isRoot=True,
 )
 
 

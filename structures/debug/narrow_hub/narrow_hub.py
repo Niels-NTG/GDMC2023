@@ -6,6 +6,7 @@ from glm import ivec3
 import globals
 import worldTools
 from StructureBase import Structure
+from Connector import Connector
 from gdpc.gdpc.block import Block
 
 
@@ -15,53 +16,56 @@ class NarrowHub(Structure):
         self,
         position: Optional[ivec3],
         facing: int = 0,
+        connectorId: int = None,
     ):
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
             facing=facing,
+            connectorId=connectorId,
         )
+
         self.connectors = [
-            {
-                'facing': 0,
-                'nextStructure': [
+            Connector(
+                facing=0,
+                nextStructure=[
                     'narrow_hallway',
                     'narrow_exit',
                     'narrow_short_bridge',
                     'narrow_short_bridge_stairs_up',
                     'narrow_short_bridge_stairs_down',
                 ]
-            },
-            {
-                'facing': 1,
-                'nextStructure': [
+            ),
+            Connector(
+                facing=1,
+                nextStructure=[
                     'narrow_hallway',
                     'narrow_exit',
                     'narrow_short_bridge',
                     'narrow_short_bridge_stairs_up',
                     'narrow_short_bridge_stairs_down',
                 ]
-            },
-            {
-                'facing': 2,
-                'nextStructure': [
+            ),
+            Connector(
+                facing=2,
+                nextStructure=[
                     'narrow_hallway',
                     'narrow_exit',
                     'narrow_short_bridge',
                     'narrow_short_bridge_stairs_up',
                     'narrow_short_bridge_stairs_down',
                 ]
-            },
-            {
-                'facing': 3,
-                'nextStructure': [
+            ),
+            Connector(
+                facing=3,
+                nextStructure=[
                     'narrow_hallway',
                     'narrow_exit',
                     'narrow_short_bridge',
                     'narrow_short_bridge_stairs_up',
                     'narrow_short_bridge_stairs_down',
                 ]
-            }
+            )
         ]
 
     def evaluateStructure(self) -> float:

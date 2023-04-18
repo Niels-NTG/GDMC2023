@@ -1,5 +1,4 @@
 from __future__ import annotations
-from copy import copy
 
 import numpy as np
 from glm import ivec3, distance
@@ -16,27 +15,41 @@ class Node:
     structure: Structure
     cost: float
     rng: np.random.Generator
-    isRoot: bool
+    parentNode: Node | None
+    connectorSlots: set[int]
     possibleActions: list[Action] | None
 
     def __init__(
         self,
         structure: Structure = None,
         cost: float = 0.0,
+        parentNode: Node | None = None,
         rng: np.random.Generator = np.random.default_rng(),
-        isRoot: bool = False
     ):
         self.structure = structure
         self.cost = cost
+        self.parentNode = parentNode
         self.rng = rng
-        self.isRoot = isRoot
+
+        self.connectorSlots = set()
 
         self.possibleActions = None
+
+    def finalise(self):
+        if self.parentNode and self.structure.connectorId:
+            self.parentNode.connectorSlots.add(self.structure.connectorId)
+        globals.nodeList.append(self)
 
     def place(self):
         self.structure.place()
 
-    def distanceToGlobalGoal(self):
+    def hasOpenSlot(self) -> bool:
+        for connector in self.structure.connectors:
+            if hash(connector) not in self.connectorSlots:
+                return True
+        return False
+
+    def distanceToGlobalGoal(self) -> float:
         return distance(globals.targetGoldBlockPosition.to_tuple(), self.structure.boxInWorldSpace.middle.to_tuple())
 
     @staticmethod
@@ -50,13 +63,9 @@ class Node:
         if worldTools.isStructureTouchingSurface(candidateStructure):
             return 0.0
 
-        # TODO Check if this needs to be adjusted to account for MCTS back prop
-        # if len(globals.nodeList) > 1:
-        #     otherNode: Node
-        #     for otherNode in globals.nodeList:
-        #         hasIntersection = candidateStructure.isIntersection(otherNode.structure)
-        #         if hasIntersection:
-        #             return 0.0
+        for otherNode in globals.nodeList:
+            if candidateStructure.isIntersection(otherNode.structure):
+                return 0.0
 
         cost = 0.0
 
@@ -73,21 +82,23 @@ class Node:
             return self.possibleActions
         possibleActions = []
 
-        connectors = copy(self.structure.connectors)
-        self.rng.shuffle(connectors)
-        for connector in connectors:
+        for connector in self.structure.connectors:
 
-            connectionRotation: int = (connector.get('facing') + self.structure.facing) % 4
+            # Check if slot isn't alrady occupied by other structure
+            connectorId = hash(connector)
+            if connectorId in self.connectorSlots:
+                continue
+
+            connectionRotation: int = (connector.facing + self.structure.facing) % 4
 
             # Check if slot for this face isn't occupied by the parent node structure
-            if self.isRoot is False and \
-                    (connector.get('facing') + self.structure.facing + 2) % 4 == self.structure.facing:
+            if self.parentNode and (connector.facing + self.structure.facing + 2) % 4 == self.structure.facing:
+                self.connectorSlots.add(connectorId)
                 continue
-            # TODO check if slot is not already taken by other nodes
 
-            connectionOffset = connector.get('offset', ivec3(0, 0, 0))
+            connectionOffset = connector.offset
 
-            nextStructures = connector.get('nextStructure', [])
+            nextStructures = connector.nextStructure
             self.rng.shuffle(nextStructures)
             for candidateStructureName in nextStructures:
                 if candidateStructureName not in globals.structureFolders:
@@ -97,6 +108,7 @@ class Node:
                 candidateStructure: Structure = structureFolder.structureClass(
                     facing=connectionRotation,
                     position=ivec3(0, 0, 0),
+                    connectorId=connectorId
                 )
 
                 currentStructureBox: Box = self.structure.box
@@ -122,20 +134,19 @@ class Node:
         return Node(
             structure=action.structure,
             cost=action.cost,
+            parentNode=self,
             rng=self.rng,
         )
 
-    def isTerminal(self):
+    def isTerminal(self) -> bool:
         if self.distanceToGlobalGoal() < 4:
             return True
         if len(self.getPossibleActions()) == 0:
             return True
         return False
 
-    def getReward(self):
+    def getReward(self) -> float:
         # only needed for terminal states
-        # return self.cost
-        # return 0 - self.distanceToGlobalGoal()
         return self.distanceToGlobalGoal()
 
     def __hash__(self):

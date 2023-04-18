@@ -7,25 +7,28 @@ if TYPE_CHECKING:
 
 from glm import ivec3
 
+from Connector import Connector
 from gdpc.gdpc.interface import placeStructure
 from gdpc.gdpc.vector_tools import Box, Rect
 
 
 class Structure:
 
-    connectors: list[dict]
+    connectors: list[Connector]
     decorationStructureFiles: dict[str, StructureFile]
     transitionStructureFiles: dict[str, StructureFile]
     structureFile: StructureFile
 
     _position: ivec3
     _facing: int
+    connectorId: int | None
 
     def __init__(
         self,
         structureFolder: StructureFolder,
         position: ivec3,
         facing: int = 0,
+        connectorId: int = None,
     ):
 
         self.structureFile = structureFolder.structureFile
@@ -35,9 +38,10 @@ class Structure:
 
         self.position = position
         self.facing = facing
+        self.connectorId = connectorId
 
     @property
-    def position(self):
+    def position(self) -> ivec3:
         return self._position
 
     @position.setter
@@ -45,7 +49,7 @@ class Structure:
         self._position = value
 
     @property
-    def facing(self):
+    def facing(self) -> int:
         return self._facing
 
     @facing.setter
