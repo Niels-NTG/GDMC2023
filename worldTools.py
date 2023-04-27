@@ -40,6 +40,7 @@ def isBoxTouchingSurface(
     return False
 
 
+# TODO check if these methods can be memoized (@functools.cache) by providing the worldSlice as function argument
 def getHeightAt(
     pos: ivec3 | ivec2,
     heightmapType: str = DEFAULT_HEIGHTMAP_TYPE
@@ -62,7 +63,7 @@ def getHeightAt(
     heightmap = globals.editor.worldSlice.heightmaps[heightmapType]
 
     positionRelativeToWorldSlice = (pos - globals.editor.worldSlice.rect.offset)
-    return int(heightmap[positionRelativeToWorldSlice.x, positionRelativeToWorldSlice.y])
+    return heightmap[positionRelativeToWorldSlice.x, positionRelativeToWorldSlice.y]
 
 
 def getSurfacePositionAt(

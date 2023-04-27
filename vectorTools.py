@@ -1,9 +1,12 @@
+import functools
+
 import numpy as np
 
 from gdpc.gdpc.vector_tools import Box
 from glm import ivec3
 
 
+@functools.cache
 def getNextPosition(facing: int = 0, currentBox: Box = None, nextBox: Box = None) -> ivec3:
     if currentBox is None:
         currentBox = Box()
@@ -21,6 +24,7 @@ def getNextPosition(facing: int = 0, currentBox: Box = None, nextBox: Box = None
     return nextPoint
 
 
+@functools.cache
 def rotatePointAroundOrigin(origin: ivec3 = ivec3(0, 0, 0), point: ivec3 = ivec3(0, 0, 0), rotation: int = 0) -> ivec3:
     if rotation == 0:
         return point

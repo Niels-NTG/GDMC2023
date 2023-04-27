@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import functools
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -56,7 +58,7 @@ class Structure:
     def facing(self, value: int):
         self._facing = value % 4
 
-    @property
+    @functools.cached_property
     def box(self) -> Box:
         # noinspection PyTypeChecker
         return Box(
@@ -79,7 +81,7 @@ class Structure:
             )
         )
 
-    @property
+    @functools.cached_property
     def rect(self) -> Rect:
         return self.box.toRect()
 

@@ -1,3 +1,4 @@
+import functools
 from pathlib import Path
 
 from glm import ivec3
@@ -40,51 +41,51 @@ class StructureFile:
     def getBlockPropertiesAt(self, x, y, z) -> dict:
         return self.getBlockProperties(self.getBlockAt(x, y, z))
 
-    @property
+    @functools.cached_property
     def sizeX(self) -> int:
         return self.nbt["size"][0].value
 
-    @property
+    @functools.cached_property
     def sizeY(self) -> int:
         return self.nbt["size"][1].value
 
-    @property
+    @functools.cached_property
     def sizeZ(self) -> int:
         return self.nbt["size"][2].value
 
-    @property
+    @functools.cached_property
     def shortestDimension(self):
         return np.argmin([np.abs(self.sizeX), np.abs(self.sizeY), np.abs(self.sizeZ)])
 
-    @property
+    @functools.cached_property
     def longestDimension(self):
         return np.argmax([np.abs(self.sizeX), np.abs(self.sizeY), np.abs(self.sizeZ)])
 
-    @property
+    @functools.cached_property
     def shortestHorizontalDimension(self) -> int:
         return np.argmin([np.abs(self.sizeX), np.abs(self.sizeZ)]) * 2
 
-    @property
+    @functools.cached_property
     def longestHorizontalDimension(self) -> int:
         return np.argmax([np.abs(self.sizeX), np.abs(self.sizeZ)]) * 2
 
-    @property
+    @functools.cached_property
     def shortestSize(self) -> int:
         return [self.sizeX, self.sizeY, self.sizeZ][self.shortestDimension]
 
-    @property
+    @functools.cached_property
     def longestSize(self) -> int:
         return [self.sizeX, self.sizeY, self.sizeZ][self.longestDimension]
 
-    @property
+    @functools.cached_property
     def shortestHorizontalSize(self) -> int:
         return [self.sizeX, 0, self.sizeZ][self.shortestHorizontalDimension]
 
-    @property
+    @functools.cached_property
     def longestHorizontalSize(self) -> int:
         return [self.sizeX, 0, self.sizeZ][self.longestHorizontalDimension]
 
-    @property
+    @functools.cached_property
     def centerPivot(self) -> ivec3:
         return ivec3(
             self.sizeX // 2,
