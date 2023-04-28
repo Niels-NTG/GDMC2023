@@ -23,14 +23,12 @@ class Structure:
 
     _position: ivec3
     _facing: int
-    connectorId: int | None
 
     def __init__(
         self,
         structureFolder: StructureFolder,
         position: ivec3,
         facing: int = 0,
-        connectorId: int = None,
     ):
 
         self.structureFile = structureFolder.structureFile
@@ -40,7 +38,6 @@ class Structure:
 
         self.position = position
         self.facing = facing
-        self.connectorId = connectorId
 
     @property
     def position(self) -> ivec3:

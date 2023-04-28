@@ -14,14 +14,12 @@ class NarrowShortBridgeStairsDown(StructureBase):
         self,
         position: Optional[ivec3],
         facing: int = 0,
-        connectorId: int = None,
     ):
 
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
             facing=facing,
-            connectorId=connectorId,
         )
         self.connectors = [
             Connector(

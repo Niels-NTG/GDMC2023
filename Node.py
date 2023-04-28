@@ -4,6 +4,7 @@ import numpy as np
 from glm import ivec3, distance
 
 import globals
+from Connector import Connector
 from StructureBase import Structure
 from gdpc.gdpc.vector_tools import Box
 import worldTools
@@ -15,7 +16,7 @@ class Node:
     structure: Structure
     cost: float
     rng: np.random.Generator
-    parentNode: Node | None
+    incomingConnector: int | None
     connectorSlots: set[int]
     possibleActions: list[Action] | None
 
@@ -23,21 +24,24 @@ class Node:
         self,
         structure: Structure = None,
         cost: float = 0.0,
-        parentNode: Node | None = None,
+        parentConnector: Connector | None = None,
         rng: np.random.Generator = np.random.default_rng(),
     ):
         self.structure = structure
         self.cost = cost
-        self.parentNode = parentNode
         self.rng = rng
 
+        self.incomingConnector = None
         self.connectorSlots = set()
+        if parentConnector:
+            self.incomingConnector = hash(parentConnector)
+            self.connectorSlots.add(2)
 
         self.possibleActions = None
 
-    def finalise(self):
-        if self.parentNode and self.structure.connectorId:
-            self.parentNode.connectorSlots.add(self.structure.connectorId)
+    def finalise(self, nextNode: Node | None):
+        if nextNode:
+            self.connectorSlots.add(nextNode.incomingConnector)
         globals.nodeList.append(self)
 
     def place(self):
@@ -84,17 +88,12 @@ class Node:
 
         for connector in self.structure.connectors:
 
-            # Check if slot isn't alrady occupied by other structure
+            # Check if slot isn't already occupied by other structure
             connectorId = hash(connector)
             if connectorId in self.connectorSlots:
                 continue
 
             connectionRotation: int = (connector.facing + self.structure.facing) % 4
-
-            # Check if slot for this face isn't occupied by the parent node structure
-            if self.parentNode and (connector.facing + self.structure.facing + 2) % 4 == self.structure.facing:
-                self.connectorSlots.add(connectorId)
-                continue
 
             connectionOffset = connector.offset
 
@@ -108,7 +107,6 @@ class Node:
                 candidateStructure: Structure = structureFolder.structureClass(
                     facing=connectionRotation,
                     position=ivec3(0, 0, 0),
-                    connectorId=connectorId
                 )
 
                 currentStructureBox: Box = self.structure.box
@@ -125,6 +123,7 @@ class Node:
                     possibleActions.append(Action(
                         structure=candidateStructure,
                         cost=candidateStructureCost,
+                        connector=connector,
                     ))
 
         self.possibleActions = possibleActions
@@ -134,7 +133,7 @@ class Node:
         return Node(
             structure=action.structure,
             cost=action.cost,
-            parentNode=self,
+            parentConnector=action.connector,
             rng=self.rng,
         )
 
@@ -165,9 +164,11 @@ class Action:
         self,
         structure: Structure = None,
         cost: float = 0.0,
+        connector: Connector = None,
     ):
         self.structure = structure
         self.cost = cost
+        self.connector = connector
 
     def __add__(self, other):
         if isinstance(other, Action):

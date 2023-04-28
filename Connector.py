@@ -20,7 +20,9 @@ class Connector:
     def __hash__(self):
         # TODO implement connectors that mirrors the vertical axis (for connecting structures on top of each other)
         # return hash((self.facing, self.offset))
-        return hash(self.facing)
+        # return hash(self.facing)
+        # TODO do not hash for debugging purposes
+        return self.facing
 
     def __eq__(self, other):
         return hash(self) == hash(other)
