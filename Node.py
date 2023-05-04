@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from typing import Callable
+
 import numpy as np
-from glm import ivec3, distance
+from glm import ivec3
 
 import globals
 from Connector import Connector
@@ -13,6 +15,7 @@ import vectorTools
 
 class Node:
 
+    rewardFunction: Callable[[Node], float] | None
     structure: Structure
     cost: float
     rng: np.random.Generator
@@ -25,10 +28,12 @@ class Node:
         structure: Structure = None,
         cost: float = 0.0,
         parentConnector: Connector | None = None,
+        rewardFunction: Callable[[Node], float] = None,
         rng: np.random.Generator = np.random.default_rng(),
     ):
         self.structure = structure
         self.cost = cost
+        self.rewardFunction = rewardFunction
         self.rng = rng
 
         self.incomingConnector = None
@@ -52,9 +57,6 @@ class Node:
             if hash(connector) not in self.connectorSlots:
                 return True
         return False
-
-    def distanceToGlobalGoal(self) -> float:
-        return distance(globals.targetGoldBlockPosition.to_tuple(), self.structure.boxInWorldSpace.middle.to_tuple())
 
     @staticmethod
     def evaluateCandidateNextStructure(candidateStructure: Structure = None) -> float:
@@ -129,16 +131,17 @@ class Node:
         self.possibleActions = possibleActions
         return possibleActions
 
-    def takeAction(self, action: Action):
+    def takeAction(self, action: Action) -> Node:
         return Node(
             structure=action.structure,
             cost=action.cost,
             parentConnector=action.connector,
+            rewardFunction=self.rewardFunction,
             rng=self.rng,
         )
 
     def isTerminal(self) -> bool:
-        if self.distanceToGlobalGoal() < 4:
+        if self.rewardFunction(self) < 4:
             return True
         if len(self.getPossibleActions()) == 0:
             return True
@@ -146,7 +149,7 @@ class Node:
 
     def getReward(self) -> float:
         # only needed for terminal states
-        return self.distanceToGlobalGoal()
+        return self.rewardFunction(self)
 
     def __hash__(self):
         return hash(self.structure)
@@ -155,7 +158,7 @@ class Node:
         return hash(self) == hash(other)
 
     def __repr__(self):
-        return f'{__class__.__name__} {self.distanceToGlobalGoal()} {self.structure}'
+        return f'{__class__.__name__} {self.rewardFunction(self)} {self.structure}'
 
 
 class Action:
