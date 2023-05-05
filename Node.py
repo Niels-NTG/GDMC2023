@@ -15,9 +15,9 @@ import vectorTools
 
 class Node:
 
-    rewardFunction: Callable[[Node], float] | None
     structure: Structure
     cost: float
+    rewardFunction: Callable[[Node], float] | None
     rng: np.random.Generator
     incomingConnector: int | None
     connectorSlots: set[int]
@@ -52,6 +52,7 @@ class Node:
     def place(self):
         self.structure.place()
 
+    @property
     def hasOpenSlot(self) -> bool:
         for connector in self.structure.connectors:
             if hash(connector) not in self.connectorSlots:
