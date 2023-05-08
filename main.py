@@ -46,12 +46,12 @@ def getFoundTrace(searcher: mcts) -> list[Node]:
     return nodeList
 
 
-def finalizeTrace(nodeList: list[Node]):
+def finalizeTrace(nodeList: list[Node], routeName: str = None):
     for index, node in enumerate(nodeList):
         nextNode = None
         if index + 1 < len(nodeList) - 1:
             nextNode = nodeList[index + 1]
-        node.finalise(nextNode)
+        node.finalise(nextNode, routeName)
 
 
 def findConnectionNode(
@@ -158,14 +158,14 @@ rootNode = Node(
 searcher1 = mcts(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
 searcher1.search(initialState=rootNode)
 nodeList1: list[Node] = getFoundTrace(searcher1)
-finalizeTrace(nodeList1)
+finalizeTrace(nodeList1, 'route1')
 
 searcher2 = mcts(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
 rootNode2 = findConnectionNode(rng=rng, rewardFunction=rewardFunction2)
 rootNode2.rewardFunction = rewardFunction2
 searcher2.search(initialState=rootNode2)
 nodeList2: list[Node] = getFoundTrace(searcher2)
-finalizeTrace(nodeList2)
+finalizeTrace(nodeList2, 'route2')
 
 placeNodes()
 

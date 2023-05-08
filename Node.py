@@ -21,6 +21,7 @@ class Node:
     rng: np.random.Generator
     incomingConnector: int | None
     connectorSlots: set[int]
+    routeNames: set[str]
     possibleActions: list[Action] | None
 
     def __init__(
@@ -42,11 +43,15 @@ class Node:
             self.incomingConnector = hash(parentConnector)
             self.connectorSlots.add(2)
 
+        self.routeNames = set()
+
         self.possibleActions = None
 
-    def finalise(self, nextNode: Node | None):
+    def finalise(self, nextNode: Node = None, routeName: str = None):
         if nextNode:
             self.connectorSlots.add(nextNode.incomingConnector)
+        if routeName:
+            self.routeNames.add(routeName)
         globals.nodeList.append(self)
 
     def place(self):
@@ -159,7 +164,7 @@ class Node:
         return hash(self) == hash(other)
 
     def __repr__(self):
-        return f'{__class__.__name__} {self.rewardFunction(self)} {self.structure}'
+        return f'{__class__.__name__} {self.routeNames} {self.rewardFunction(self)} {self.structure}'
 
 
 class Action:
