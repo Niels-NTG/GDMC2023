@@ -55,24 +55,17 @@ def finalizeTrace(nodeList: list[Node], routeName: str = None):
 
 
 def findConnectionNode(
-    rewardFunction: Callable[[Node], float] = None,
-    rng: np.random.Generator = np.random.default_rng()
+    rewardFunction: Callable[[Node], float] = None
 ) -> Node:
     candidateNodes: list[Node] = []
     rewards: list[float] = []
     for finalizedNode in globals.nodeList:
         if finalizedNode.hasOpenSlot:
             candidateNodes.append(finalizedNode)
-            rewards.append(rewardFunction1(finalizedNode) if rewardFunction else 1.0)
+            rewards.append(rewardFunction(finalizedNode))
     if len(candidateNodes) == 0:
         raise Exception('Could not fit node with open connection slot')
     return candidateNodes[np.argmin(rewards)]
-    # rewardsSum = sum(rewards)
-    # weights = []
-    # for reward in rewards:
-    #     weights.append(1 - (reward / rewardsSum))
-    # weights = weights / np.sum(weights)
-    # return rng.choice(candidateNodes, p=weights)
 
 
 def placeNodes():
@@ -161,7 +154,7 @@ nodeList1: list[Node] = getFoundTrace(searcher1)
 finalizeTrace(nodeList1, 'route1')
 
 searcher2 = mcts(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
-rootNode2 = findConnectionNode(rng=rng, rewardFunction=rewardFunction2)
+rootNode2 = findConnectionNode(rewardFunction=rewardFunction2)
 rootNode2.rewardFunction = rewardFunction2
 searcher2.search(initialState=rootNode2)
 nodeList2: list[Node] = getFoundTrace(searcher2)
