@@ -69,7 +69,7 @@ class NarrowHub(Structure):
         score = super().evaluateStructure()
 
         pillarCost = (
-            self.position.y - worldTools.getHeightAt(pos=self.boxInWorldSpace.middle, heightmapType='OCEAN_FLOOR')
+            self.position.y - worldTools.getHeightAt(pos=self.boxInWorldSpace.middle, heightmapType='OCEAN_FLOOR_NO_PLANTS')
         ) ** 2.0
         if pillarCost < 0:
             # If pillar cost is negative, do not built underground
@@ -83,7 +83,7 @@ class NarrowHub(Structure):
 
         # Place pillar
         pillarPosition = self.boxInWorldSpace.middle
-        for y in range(worldTools.getHeightAt(pos=pillarPosition, heightmapType='OCEAN_FLOOR'), self.position.y):
+        for y in range(worldTools.getHeightAt(pos=pillarPosition, heightmapType='OCEAN_FLOOR_NO_PLANTS'), self.position.y):
             globals.editor.placeBlockGlobal(
                 position=ivec3(pillarPosition.x, y, pillarPosition.z),
                 block=Block('minecraft:bricks')

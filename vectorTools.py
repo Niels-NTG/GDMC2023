@@ -2,7 +2,7 @@ import functools
 
 import numpy as np
 
-from gdpc.gdpc.vector_tools import Box
+from gdpc.gdpc.vector_tools import Box, Rect
 from glm import ivec3
 
 
@@ -33,4 +33,14 @@ def rotatePointAroundOrigin(origin: ivec3 = ivec3(0, 0, 0), point: ivec3 = ivec3
         int(np.round(np.cos(angle) * (point.x - origin.x) - np.sin(angle) * (point.z - origin.z) + origin.x)),
         point.y,
         int(np.round(np.sin(angle) * (point.x - origin.x) + np.cos(angle) * (point.z - origin.z) + origin.z))
+    )
+
+
+@functools.cache
+def isRectinRect(rectA: Rect, rectB: Rect) -> bool:
+    return (
+        rectB.begin.x >= rectA.begin.x and
+        rectB.begin.y >= rectA.begin.y and
+        rectB.end.x <= rectA.end.x and
+        rectB.end.y <= rectA.end.y
     )

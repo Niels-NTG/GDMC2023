@@ -3,6 +3,9 @@ from __future__ import annotations
 import functools
 from typing import TYPE_CHECKING
 
+import globals
+import worldTools
+
 if TYPE_CHECKING:
     from StructureFolder import StructureFolder
     from StructureFile import StructureFile
@@ -21,6 +24,8 @@ class Structure:
     transitionStructureFiles: dict[str, StructureFile]
     structureFile: StructureFile
 
+    preProcessingSteps: list[worldTools.PlacementInstruction]
+
     _position: ivec3
     _facing: int
 
@@ -35,6 +40,8 @@ class Structure:
         self.transitionStructureFiles = structureFolder.transitionStructureFiles
         self.decorationStructureFiles = structureFolder.decorationStructureFiles
         self.connectors = []
+
+        self.preProcessingSteps = []
 
         self.position = position
         self.facing = facing
@@ -101,10 +108,20 @@ class Structure:
         return False
 
     def evaluateStructure(self) -> float:
-        return 1.0
+        cost = 1.0
+
+        treeCuttingPositions = worldTools.getTreeCuttingInstructions(self.rectInWorldSpace)
+        cost += len(treeCuttingPositions) * 0.2
+        self.preProcessingSteps.extend(treeCuttingPositions)
+
+        return cost
 
     def doPreProcessingSteps(self):
-        pass
+        for preProcessingStep in self.preProcessingSteps:
+            globals.editor.placeBlockGlobal(
+                position=preProcessingStep.position,
+                block=preProcessingStep.block,
+            )
 
     def place(self):
         self.doPreProcessingSteps()

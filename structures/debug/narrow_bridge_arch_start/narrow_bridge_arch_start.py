@@ -45,7 +45,10 @@ class NarrowBridgeArchStart(StructureBase):
 
         bridgeStart = self.getPillarBox()
         try:
-            pillarHeight = self.position.y - worldTools.getHeightAt(pos=bridgeStart.middle, heightmapType='OCEAN_FLOOR')
+            pillarHeight = self.position.y - worldTools.getHeightAt(
+                pos=bridgeStart.middle,
+                heightmapType='OCEAN_FLOOR_NO_PLANTS'
+            )
             if pillarHeight < 0:
                 # If pillar cost is negative, do not built underground
                 return 0.0
@@ -64,7 +67,7 @@ class NarrowBridgeArchStart(StructureBase):
         pillarBox = self.getPillarBox()
         pillarRect = pillarBox.toRect()
         for pillarPosition in loop2D(begin=pillarRect.begin, end=pillarRect.end):
-            for y in range(worldTools.getHeightAt(pos=pillarPosition, heightmapType='OCEAN_FLOOR'), self.position.y):
+            for y in range(worldTools.getHeightAt(pos=pillarPosition, heightmapType='OCEAN_FLOOR_NO_PLANTS'), self.position.y):
                 globals.editor.placeBlockGlobal(
                     position=ivec3(pillarPosition.x, y, pillarPosition.y),
                     block=Block('minecraft:bricks')

@@ -1,12 +1,26 @@
+import re
+
 import numpy as np
 from glm import ivec2, ivec3
 
 import globals
 from StructureBase import Structure
-from gdpc.gdpc.vector_tools import Box, loop2D
+from gdpc.gdpc.vector_tools import Box, Rect, loop2D
+from gdpc.gdpc.block import Block
+from gdpc.gdpc import lookup
+
+DEFAULT_HEIGHTMAP_TYPE: str = 'MOTION_BLOCKING_NO_PLANTS'
 
 
-DEFAULT_HEIGHTMAP_TYPE: str = 'MOTION_BLOCKING_NO_LEAVES'
+class PlacementInstruction:
+
+    def __init__(
+        self,
+        position: ivec3 = None,
+        block: Block = None
+    ):
+        self.position = position
+        self.block = block
 
 
 def isStructureInsideBuildArea(structure: Structure) -> bool:
@@ -40,7 +54,6 @@ def isBoxTouchingSurface(
     return False
 
 
-# TODO check if these methods can be memoized (@functools.cache) by providing the worldSlice as function argument
 def getHeightAt(
     pos: ivec3 | ivec2,
     heightmapType: str = DEFAULT_HEIGHTMAP_TYPE
@@ -105,3 +118,58 @@ def getRandomSurfacePositionForBox(
         if isBoxInsideBuildArea(box):
             return pos
     raise Exception('Could not fit box inside build area')
+
+
+def getSapling(
+    block: Block = None
+) -> Block:
+    woodType = re.sub(r'minecraft:|_.+$', '', block.id)
+    if woodType == 'mangrove':
+        return Block(id='minecraft:mangrove_propagule', states={'stage': '1'})
+    if woodType in lookup.WOOD_TYPES:
+        return Block(id=f'minecraft:{woodType}_sapling', states={'stage': '1'})
+
+
+def getTreeCuttingInstructions(
+    area: Rect
+) -> list[PlacementInstruction]:
+    treeCuttingInstructions: list[PlacementInstruction] = []
+    innerArea = area.centeredSubRect(size=area.size + 4)
+    outerArea = area.centeredSubRect(size=area.size + 10)
+    rng = np.random.default_rng()
+
+    diffHeightmap = globals.editor.worldSlice.heightmaps['MOTION_BLOCKING'] - \
+        globals.editor.worldSlice.heightmaps['MOTION_BLOCKING_NO_PLANTS']
+    treePositions = np.argwhere(diffHeightmap > 0)
+
+    for xzPos in treePositions:
+        pos2DInWorldSpace = ivec2(xzPos[0], xzPos[1]) + globals.editor.worldSlice.rect.offset
+        if not outerArea.contains(pos2DInWorldSpace):
+            continue
+        for y in range(diffHeightmap[xzPos[0], xzPos[1]]):
+            pos3D = ivec3(
+                pos2DInWorldSpace.x,
+                y + globals.editor.worldSlice.heightmaps['MOTION_BLOCKING_NO_PLANTS'][xzPos[0], xzPos[1]],
+                pos2DInWorldSpace.y
+            )
+            block: Block = globals.editor.worldSlice.getBlockGlobal(pos3D)
+            if block.id in lookup.PLANT_BLOCKS:
+                if not innerArea.contains(pos2DInWorldSpace):
+                    if block.id in lookup.LEAVES and rng.random() > 0.25:
+                        continue
+                    if y == 0 and block.id in lookup.LOGS:
+                        replacementSapling = getSapling(block)
+                        if replacementSapling:
+                            treeCuttingInstructions.append(PlacementInstruction(
+                                block=replacementSapling,
+                                position=pos3D
+                            ))
+                            continue
+                treeCuttingInstructions.append(PlacementInstruction(
+                    block=Block('minecraft:air'),
+                    position=pos3D
+                ))
+
+    # NOTE: all pre-processing steps are applied, set /gamerule randomTickSpeed to 100, then after a few seconds set
+    # it back to the default value of 3 and remove all items with globals.editor.runCommandGlobal('kill @e[type=item]')
+    return treeCuttingInstructions
