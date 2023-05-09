@@ -130,17 +130,36 @@ def getSapling(
         return Block(id=f'minecraft:{woodType}_sapling', states={'stage': '1'})
 
 
+def calculateTreeCuttingCost(
+    area: Rect
+) -> int:
+    diffHeightmap = globals.editor.worldSlice.heightmaps['MOTION_BLOCKING'] - \
+                    globals.editor.worldSlice.heightmaps['MOTION_BLOCKING_NO_PLANTS']
+    outerAreaRelativeToBuildArea = Rect(
+        offset=area.offset - globals.editor.worldSlice.rect.offset,
+        size=area.size
+    )
+    diffHeightmap = diffHeightmap[
+        outerAreaRelativeToBuildArea.begin.x:outerAreaRelativeToBuildArea.end.x,
+        outerAreaRelativeToBuildArea.begin.y:outerAreaRelativeToBuildArea.end.y,
+    ]
+    return int(np.sum(diffHeightmap))
+
+
 def getTreeCuttingInstructions(
     area: Rect
 ) -> list[PlacementInstruction]:
     treeCuttingInstructions: list[PlacementInstruction] = []
+
     innerArea = area.centeredSubRect(size=area.size + 4)
     outerArea = area.centeredSubRect(size=area.size + 10)
-    rng = np.random.default_rng()
 
     diffHeightmap = globals.editor.worldSlice.heightmaps['MOTION_BLOCKING'] - \
         globals.editor.worldSlice.heightmaps['MOTION_BLOCKING_NO_PLANTS']
+
     treePositions = np.argwhere(diffHeightmap > 0)
+
+    rng = np.random.default_rng()
 
     for xzPos in treePositions:
         pos2DInWorldSpace = ivec2(xzPos[0], xzPos[1]) + globals.editor.worldSlice.rect.offset

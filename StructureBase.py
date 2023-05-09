@@ -110,13 +110,13 @@ class Structure:
     def evaluateStructure(self) -> float:
         cost = 1.0
 
-        treeCuttingPositions = worldTools.getTreeCuttingInstructions(self.rectInWorldSpace)
-        cost += len(treeCuttingPositions) * 0.2
-        self.preProcessingSteps.extend(treeCuttingPositions)
+        # TODO self.preProcessingSteps = [] may need to be reset when structure is being evaluated
+        cost += worldTools.calculateTreeCuttingCost(self.rectInWorldSpace) * 0.2
 
         return cost
 
     def doPreProcessingSteps(self):
+        self.preProcessingSteps.extend(worldTools.getTreeCuttingInstructions(self.rectInWorldSpace))
         for preProcessingStep in self.preProcessingSteps:
             globals.editor.placeBlockGlobal(
                 position=preProcessingStep.position,
