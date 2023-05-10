@@ -69,35 +69,41 @@ def findConnectionNode(
 
 
 def placeNodes():
+    # Set random tick speed to zero to prevent any trees from growing while structures are being placed.
+    globals.editor.runCommandGlobal('gamerule randomTickSpeed 0')
+    for node in globals.nodeList:
+        node.doPreProcessingSteps()
+    globals.editor.flushBuffer()
+
     for node in globals.nodeList:
         node.place()
 
+    for node in globals.nodeList:
+        node.doPostProcessingSteps()
 
-rng = np.random.default_rng(44442189199140987222)
-    globals.editor.runCommandGlobal(
-        f'fill {globals.buildarea.begin.x} {y} {globals.buildarea.begin.y} {globals.buildarea.last.x} {y} {globals.buildarea.last.y} minecraft:air',
+    # Set random tick speed to 300 for a little bit to speed up tree growth
+    globals.editor.runCommandGlobal('gamerule randomTickSpeed 300')
+    globals.editor.flushBuffer()
+    globals.editor.runCommandGlobal('gamerule randomTickSpeed 3')
+    globals.editor.runCommandGlobal('kill @e[type=item]')
 
-    )
-globals.editor.runCommandGlobal('kill @e[type=item]')
 
-globals.editor.loadWorldSlice(rect=globals.buildarea, cache=True)
+rng = np.random.default_rng(807414098708321)
 
-globals.targetGoldBlockPosition = worldTools.getSurfacePositionAt(pos=globals.buildarea.begin + 9)
+globals.targetGoldBlockPosition = worldTools.getRandomSurfacePosition(rng)
 globals.editor.placeBlock(
     position=globals.targetGoldBlockPosition,
     block=Block('gold_block')
 )
 print(f'Gold block at {globals.targetGoldBlockPosition}')
 
-globals.targetEmeraldBlockPosition = worldTools.getSurfacePositionAt(pos=ivec2(
-    globals.buildarea.begin.x + 9,
-    globals.buildarea.last.y - 9
-))
+globals.targetEmeraldBlockPosition = worldTools.getRandomSurfacePosition(rng)
 globals.editor.placeBlock(
     position=globals.targetEmeraldBlockPosition,
     block=Block('emerald_block')
 )
 print(f'Emerald block at {globals.targetEmeraldBlockPosition}')
+
 globals.editor.placeBlock(
     position=worldTools.getSurfacePositionAt(globals.buildarea.begin),
     block=Block('red_concrete')
@@ -125,7 +131,7 @@ rootStructure = NarrowHub(
     facing=rng.integers(4),
     position=ivec3(0, 0, 0)
 )
-rootStructure.position = worldTools.getSurfacePositionAt(globals.buildarea.last - 9)
+rootStructure.position = worldTools.getRandomSurfacePosition(rng)
 globals.editor.placeBlockGlobal(
     position=rootStructure.position,
     block=Block('diamond_block')

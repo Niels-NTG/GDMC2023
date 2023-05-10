@@ -124,7 +124,6 @@ class Structure:
             )
 
     def place(self):
-        self.doPreProcessingSteps()
         # noinspection PyTypeChecker
         response = placeStructure(
             self.structureFile.file,
@@ -132,7 +131,6 @@ class Structure:
             pivot=self.structureFile.centerPivot
         )
         print(f"Placed {self} ({response}) at {self.position} facing {self.facing}")
-        self.doPostProcessingSteps()
 
     def doPostProcessingSteps(self):
         pass

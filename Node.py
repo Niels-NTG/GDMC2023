@@ -54,8 +54,14 @@ class Node:
             self.routeNames.add(routeName)
         globals.nodeList.append(self)
 
+    def doPreProcessingSteps(self):
+        self.structure.doPreProcessingSteps()
+
     def place(self):
         self.structure.place()
+
+    def doPostProcessingSteps(self):
+        self.structure.doPostProcessingSteps()
 
     @property
     def hasOpenSlot(self) -> bool:
