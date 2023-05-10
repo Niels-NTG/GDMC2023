@@ -22,6 +22,9 @@ class PlacementInstruction:
         self.position = position
         self.block = block
 
+    def __hash__(self):
+        return hash(self.position)
+
 
 def isStructureInsideBuildArea(structure: Structure) -> bool:
     return isBoxInsideBuildArea(structure.boxInWorldSpace)
@@ -177,7 +180,8 @@ def getTreeCuttingInstructions(
                 if not innerArea.contains(pos2DInWorldSpace):
                     if block.id in lookup.LEAVES and rng.random() > 0.25:
                         continue
-                    if y == 0 and rng.random() > 0.25 and block.id in lookup.LOGS:
+                    if y == 0 and rng.random() > 0.25 and block.id in lookup.LOGS and \
+                            not is2DPositionContainedInNodes(pos=pos2DInWorldSpace, exludeRect=innerArea):
                         replacementSapling = getSapling(block)
                         if replacementSapling:
                             treeCuttingInstructions.append(PlacementInstruction(
@@ -193,3 +197,17 @@ def getTreeCuttingInstructions(
     # NOTE: all pre-processing steps are applied, set /gamerule randomTickSpeed to 100, then after a few seconds set
     # it back to the default value of 3 and remove all items with globals.editor.runCommandGlobal('kill @e[type=item]')
     return treeCuttingInstructions
+
+
+def is2DPositionContainedInNodes(
+    pos: ivec2,
+    exludeRect: Rect = None
+) -> bool:
+    # noinspection PyTypeChecker
+    if exludeRect and exludeRect.contains(pos):
+        return True
+    for node in globals.nodeList:
+        nodeRect: Rect = node.structure.rectInWorldSpace
+        if nodeRect.centeredSubRect(size=nodeRect.size + 4).contains(pos):
+            return True
+    return False
