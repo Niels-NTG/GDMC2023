@@ -3,4 +3,4 @@
 	url = git@github.com:Niels-NTG/gdpc.git
 [submodule "MCTS"]
 	path = MCTS
-	url = git@github.com:pbsinclair42/MCTS.git
+	url = git@github.com:Niels-NTG/MCTS.git
