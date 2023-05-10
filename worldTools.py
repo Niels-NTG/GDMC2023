@@ -133,11 +133,12 @@ def getSapling(
 def calculateTreeCuttingCost(
     area: Rect
 ) -> int:
-    diffHeightmap = globals.editor.worldSlice.heightmaps['MOTION_BLOCKING'] - \
+    diffHeightmap = globals.editor.worldSlice.heightmaps['MOTION_BLOCKING_NO_LEAVES'] - \
                     globals.editor.worldSlice.heightmaps['MOTION_BLOCKING_NO_PLANTS']
+    outerArea = area.centeredSubRect(size=area.size + 10)
     outerAreaRelativeToBuildArea = Rect(
-        offset=area.offset - globals.editor.worldSlice.rect.offset,
-        size=area.size
+        offset=outerArea.offset - globals.editor.worldSlice.rect.offset,
+        size=outerArea.size
     )
     diffHeightmap = diffHeightmap[
         outerAreaRelativeToBuildArea.begin.x:outerAreaRelativeToBuildArea.end.x,
