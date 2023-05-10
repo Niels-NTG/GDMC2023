@@ -176,7 +176,7 @@ def getTreeCuttingInstructions(
                 if not innerArea.contains(pos2DInWorldSpace):
                     if block.id in lookup.LEAVES and rng.random() > 0.25:
                         continue
-                    if y == 0 and block.id in lookup.LOGS:
+                    if y == 0 and rng.random() > 0.25 and block.id in lookup.LOGS:
                         replacementSapling = getSapling(block)
                         if replacementSapling:
                             treeCuttingInstructions.append(PlacementInstruction(
