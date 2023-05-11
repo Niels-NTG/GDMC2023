@@ -4,7 +4,7 @@ import glm
 import numpy as np
 from glm import ivec2, ivec3
 
-from MCTS.mcts import mcts
+from MCTS.mcts import MCTS
 
 from gdpc.gdpc.block import Block
 
@@ -35,15 +35,6 @@ def mctsRolloutPolicy(state: Node, rng: np.random.Generator = np.random.default_
             raise Exception(f'Non-terminal state has no possible actions: {state}')
         state = state.takeAction(selectedAction)
     return state.getReward()
-
-
-def getFoundTrace(searcher: mcts) -> list[Node]:
-    nodeList: list[Node] = []
-    treeNode = searcher.root
-    while not treeNode.isTerminal:
-        nodeList.append(treeNode.state)
-        treeNode = searcher.getBestChild(treeNode, 0)
-    return nodeList
 
 
 def finalizeTrace(nodeList: list[Node], routeName: str = None):
@@ -153,16 +144,17 @@ rootNode = Node(
     rng=globalRNG,
     rewardFunction=rewardFunction1
 )
-searcher1 = mcts(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
+# TODO change MCTS to use np.random instead of random library
+searcher1 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
 searcher1.search(initialState=rootNode)
-nodeList1: list[Node] = getFoundTrace(searcher1)
+nodeList1: list[Node] = searcher1.getBestRoute()
 finalizeTrace(nodeList1, 'route1')
 
-searcher2 = mcts(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
+searcher2 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
 rootNode2 = findConnectionNode(rewardFunction=rewardFunction2)
 rootNode2.rewardFunction = rewardFunction2
 searcher2.search(initialState=rootNode2)
-nodeList2: list[Node] = getFoundTrace(searcher2)
+nodeList2: list[Node] = searcher2.getBestRoute()
 finalizeTrace(nodeList2, 'route2')
 
 placeNodes()
