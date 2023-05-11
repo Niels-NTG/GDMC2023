@@ -94,4 +94,4 @@ class StructureFile:
         )
 
     def __repr__(self):
-        return f'{__class__.__name__} {self.name}'
+        return f'{self.name}'

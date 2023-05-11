@@ -9,9 +9,6 @@ global structureFolders
 global buildarea
 global editor
 
-global targetGoldBlockPosition
-global targetEmeraldBlockPosition
-
 global nodeList
 
 

@@ -16,8 +16,8 @@ from structures.debug.narrow_hub.narrow_hub import NarrowHub
 globals.initialize()
 
 
-for y in range(0, 7):
-def mctsRolloutPolicy(state: Node):
+
+def mctsRolloutPolicy(state: Node, rng: np.random.Generator = np.random.default_rng()) -> float:
     while not state.isTerminal():
         try:
             actions = state.getPossibleActions()
@@ -88,21 +88,21 @@ def placeNodes():
     globals.editor.runCommandGlobal('kill @e[type=item]')
 
 
-rng = np.random.default_rng(807414098708321)
+globalRNG = np.random.default_rng(2190828244)
 
-globals.targetGoldBlockPosition = worldTools.getRandomSurfacePosition(rng)
+targetGoldBlockPosition = worldTools.getRandomSurfacePosition(globalRNG)
 globals.editor.placeBlock(
-    position=globals.targetGoldBlockPosition,
+    position=targetGoldBlockPosition,
     block=Block('gold_block')
 )
-print(f'Gold block at {globals.targetGoldBlockPosition}')
+print(f'Gold block at {targetGoldBlockPosition}')
 
-globals.targetEmeraldBlockPosition = worldTools.getRandomSurfacePosition(rng)
+targetEmeraldBlockPosition = worldTools.getRandomSurfacePosition(globalRNG)
 globals.editor.placeBlock(
-    position=globals.targetEmeraldBlockPosition,
+    position=targetEmeraldBlockPosition,
     block=Block('emerald_block')
 )
-print(f'Emerald block at {globals.targetEmeraldBlockPosition}')
+print(f'Emerald block at {targetEmeraldBlockPosition}')
 
 globals.editor.placeBlock(
     position=worldTools.getSurfacePositionAt(globals.buildarea.begin),
@@ -128,10 +128,10 @@ globals.editor.placeBlock(
 )
 
 rootStructure = NarrowHub(
-    facing=rng.integers(4),
+    facing=globalRNG.integers(4),
     position=ivec3(0, 0, 0)
 )
-rootStructure.position = worldTools.getRandomSurfacePosition(rng)
+rootStructure.position = worldTools.getRandomSurfacePosition(globalRNG)
 globals.editor.placeBlockGlobal(
     position=rootStructure.position,
     block=Block('diamond_block')
@@ -139,19 +139,18 @@ globals.editor.placeBlockGlobal(
 
 
 def rewardFunction1(node: Node) -> float:
-    return glm.distance(globals.targetGoldBlockPosition.to_tuple(), node.structure.boxInWorldSpace.middle.to_tuple())
+    return glm.distance(targetGoldBlockPosition.to_tuple(), node.structure.boxInWorldSpace.middle.to_tuple())
 
 
 def rewardFunction2(node: Node) -> float:
-    return glm.distance(globals.targetEmeraldBlockPosition.to_tuple(), node.structure.boxInWorldSpace.middle.to_tuple())
+    return glm.distance(targetEmeraldBlockPosition.to_tuple(), node.structure.boxInWorldSpace.middle.to_tuple())
 
 
 # TODO also implement custom isTerminalFunction
 
-
 rootNode = Node(
     structure=rootStructure,
-    rng=rng,
+    rng=globalRNG,
     rewardFunction=rewardFunction1
 )
 searcher1 = mcts(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)

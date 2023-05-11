@@ -3,15 +3,14 @@ from __future__ import annotations
 import functools
 from typing import TYPE_CHECKING
 
-import globals
-import worldTools
-
 if TYPE_CHECKING:
     from StructureFolder import StructureFolder
     from StructureFile import StructureFile
 
 from glm import ivec3
 
+import globals
+import worldTools
 from Connector import Connector
 from gdpc.gdpc.interface import placeStructure
 from gdpc.gdpc.vector_tools import Box, Rect
@@ -93,16 +92,15 @@ class Structure:
     def rectInWorldSpace(self) -> Rect:
         return self.boxInWorldSpace.toRect()
 
-    def isIntersection(self, otherStructure: Structure = None):
+    def isIntersection(self, otherStructure: Structure = None) -> bool:
         if otherStructure is None:
             return False
         otherStructureBox = otherStructure.boxInWorldSpace
         otherStructureBox.erode()
         currentBox = self.boxInWorldSpace
-        hasIntersection = currentBox.collides(otherStructureBox)
-        return hasIntersection
+        return currentBox.collides(otherStructureBox)
 
-    def isSameType(self, otherStructure: Structure = None):
+    def isSameType(self, otherStructure: Structure = None) -> bool:
         if otherStructure:
             return otherStructure.structureFile == self.structureFile
         return False
@@ -110,7 +108,6 @@ class Structure:
     def evaluateStructure(self) -> float:
         cost = 1.0
 
-        # TODO self.preProcessingSteps = [] may need to be reset when structure is being evaluated
         cost += worldTools.calculateTreeCuttingCost(self.rectInWorldSpace) * 0.2
 
         return cost
