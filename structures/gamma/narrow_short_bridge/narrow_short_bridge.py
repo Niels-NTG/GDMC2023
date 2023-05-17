@@ -29,7 +29,8 @@ class NarrowShortBridge(Structure):
                     'narrow_exit',
                     'narrow_hub',
                     'narrow_stairs_down',
-                    'narrow_stairs_up',
+                    'narrow_stairs_up_1',
+                    'narrow_stairs_up_2',
                     'wide_greenhouse',
                     # 'wide_hub',
                 ]
@@ -42,7 +43,8 @@ class NarrowShortBridge(Structure):
                     'narrow_exit',
                     'narrow_hub',
                     'narrow_stairs_down',
-                    'narrow_stairs_up',
+                    'narrow_stairs_up_1',
+                    'narrow_stairs_up_2',
                     'wide_greenhouse',
                     # 'wide_hub',
                 ]

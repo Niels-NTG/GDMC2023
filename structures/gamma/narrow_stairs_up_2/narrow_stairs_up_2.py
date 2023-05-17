@@ -12,7 +12,7 @@ from StructureBase import Structure
 from gdpc.gdpc import Block
 
 
-class NarrowStairsDown(Structure):
+class NarrowStairsUp2(Structure):
 
     def __init__(
         self,
@@ -28,6 +28,7 @@ class NarrowStairsDown(Structure):
         self.connectors = [
             Connector(
                 facing=0,
+                offset=ivec3(0, 10, 0),
                 nextStructure=[
                     'narrow_short_bridge',
                 ]
@@ -39,14 +40,6 @@ class NarrowStairsDown(Structure):
                 ]
             )
         ]
-
-    @property
-    def position(self):
-        return self._position + ivec3(0, -5, 0)
-
-    @position.setter
-    def position(self, value: ivec3):
-        self._position = value
 
     def evaluateStructure(self) -> float:
         cost = super().evaluateStructure()

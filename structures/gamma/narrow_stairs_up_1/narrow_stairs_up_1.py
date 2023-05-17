@@ -12,7 +12,7 @@ from StructureBase import Structure
 from gdpc.gdpc import Block
 
 
-class NarrowStairsUp(Structure):
+class NarrowStairsUp1(Structure):
 
     def __init__(
         self,
