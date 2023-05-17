@@ -6,8 +6,9 @@ from glm import ivec3, ivec2
 import globals
 import vectorTools
 import worldTools
-from StructureBase import Structure
 from Connector import Connector
+from Node import Node
+from StructureBase import Structure
 from gdpc.gdpc.block import Block
 
 
@@ -56,8 +57,8 @@ class WideGreenhouse(Structure):
 
         return score
 
-    def doPostProcessingSteps(self):
-        super().doPostProcessingSteps()
+    def doPostProcessingSteps(self, node: Node = None):
+        super().doPostProcessingSteps(node)
 
         # Place pillar
         pillarPositions: list[ivec2] = [

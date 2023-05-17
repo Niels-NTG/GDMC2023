@@ -5,9 +5,11 @@ from glm import ivec3
 
 import globals
 import worldTools
-from StructureBase import Structure
 from Connector import Connector
+from Node import Node
+from StructureBase import Structure
 from gdpc.gdpc.block import Block
+from gdpc.gdpc.interface import placeStructure
 
 
 class NarrowHub(Structure):
@@ -52,6 +54,8 @@ class NarrowHub(Structure):
                 ]
             )
         ]
+        self.eastDoorTransitionStructure = self.transitionStructureFiles['door_east.nbt']
+        self.southTransitionStructure = self.transitionStructureFiles['door_south.nbt']
 
     def evaluateStructure(self) -> float:
         cost = super().evaluateStructure()
@@ -69,8 +73,8 @@ class NarrowHub(Structure):
 
         return cost
 
-    def doPostProcessingSteps(self):
-        super().doPostProcessingSteps()
+    def doPostProcessingSteps(self, node: Node = None):
+        super().doPostProcessingSteps(node)
 
         # Place pillar
         pillarPos = self.boxInWorldSpace.middle
@@ -81,4 +85,15 @@ class NarrowHub(Structure):
             globals.editor.placeBlockGlobal(
                 position=ivec3(pillarPos.x, y, pillarPos.z),
                 block=Block('minecraft:weathered_copper')
+            )
+
+        for connector in node.connectorSlots:
+            connectionRotation = (connector + self.facing) % 4
+            transitionStructure = self.southTransitionStructure \
+                if connector % 2 == 1 else self.eastDoorTransitionStructure
+            # noinspection PyTypeChecker
+            placeStructure(
+                transitionStructure.file,
+                position=self.position, rotate=connectionRotation, mirror=None,
+                pivot=transitionStructure.centerPivot
             )

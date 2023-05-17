@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from StructureFolder import StructureFolder
     from StructureFile import StructureFile
+    from Node import Node
 
 from glm import ivec3, ivec2
 
@@ -133,7 +134,7 @@ class Structure:
         )
         print(f"Placed {self} ({response}) at {self.position} facing {self.facing}")
 
-    def doPostProcessingSteps(self):
+    def doPostProcessingSteps(self, node: Node = None):
         pass
 
     def __eq__(self, other):

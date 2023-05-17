@@ -6,6 +6,7 @@ from glm import ivec3, ivec2
 import globals
 import vectorTools
 import worldTools
+from Node import Node
 from StructureBase import Structure
 from Connector import Connector
 from gdpc.gdpc.block import Block
@@ -56,8 +57,8 @@ class MediumHallway(Structure):
 
         return cost
 
-    def doPostProcessingSteps(self):
-        super().doPostProcessingSteps()
+    def doPostProcessingSteps(self, node: Node = None):
+        super().doPostProcessingSteps(node)
 
         # Place pillar
         pillarPositions: list[ivec2] = [

@@ -6,9 +6,11 @@ from glm import ivec3, ivec2
 import globals
 import vectorTools
 import worldTools
-from StructureBase import Structure
 from Connector import Connector
+from Node import Node
+from StructureBase import Structure
 from gdpc.gdpc.block import Block
+from gdpc.gdpc.interface import placeStructure
 
 
 class MediumHub(Structure):
@@ -53,6 +55,7 @@ class MediumHub(Structure):
                 ]
             )
         ]
+        self.doorTransitionStructure = self.transitionStructureFiles['door.nbt']
 
     def evaluateStructure(self) -> float:
         cost = super().evaluateStructure()
@@ -70,8 +73,8 @@ class MediumHub(Structure):
 
         return cost
 
-    def doPostProcessingSteps(self):
-        super().doPostProcessingSteps()
+    def doPostProcessingSteps(self, node: Node = None):
+        super().doPostProcessingSteps(node)
 
         # Place pillar
         pillarPositions: list[ivec2] = [
@@ -94,3 +97,12 @@ class MediumHub(Structure):
                     position=ivec3(pillarPosition.x, y, pillarPosition.y),
                     block=Block('minecraft:weathered_copper')
                 )
+
+        for connector in node.connectorSlots:
+            connectionRotation = (connector + self.facing) % 4
+            # noinspection PyTypeChecker
+            placeStructure(
+                self.doorTransitionStructure.file,
+                position=self.position, rotate=connectionRotation, mirror=None,
+                pivot=self.doorTransitionStructure.centerPivot
+            )

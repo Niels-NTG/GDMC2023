@@ -6,8 +6,9 @@ from glm import ivec3
 import globals
 import vectorTools
 import worldTools
-from StructureBase import Structure
 from Connector import Connector
+from Node import Node
+from StructureBase import Structure
 from gdpc.gdpc.block import Block
 
 
@@ -28,7 +29,7 @@ class NarrowExit(Structure):
                 facing=2,
                 nextStructure=[
                     'medium_hub',
-                    'medium_hallway',
+                    # 'medium_hallway',
                     'wide_hub',
                     'narrow_hub',
                     'narrow_short_bridge',
@@ -55,8 +56,8 @@ class NarrowExit(Structure):
 
         return cost
 
-    def doPostProcessingSteps(self):
-        super().doPostProcessingSteps()
+    def doPostProcessingSteps(self, node: Node = None):
+        super().doPostProcessingSteps(node)
 
         # Place pillar
         pillarPos = self.boxInWorldSpace.middle

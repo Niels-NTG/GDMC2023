@@ -4,10 +4,11 @@ from typing import Optional
 from glm import ivec3, ivec2
 
 import globals
-import worldTools
-from StructureBase import Structure
-from Connector import Connector
 import vectorTools
+import worldTools
+from Connector import Connector
+from Node import Node
+from StructureBase import Structure
 from gdpc.gdpc.block import Block
 
 
@@ -70,8 +71,8 @@ class WideHub(Structure):
 
         return score
 
-    def doPostProcessingSteps(self):
-        super().doPostProcessingSteps()
+    def doPostProcessingSteps(self, node: Node = None):
+        super().doPostProcessingSteps(node)
 
         # Place pillar
         pillarPositions: list[ivec2] = [

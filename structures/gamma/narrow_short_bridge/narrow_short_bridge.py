@@ -24,29 +24,27 @@ class NarrowShortBridge(Structure):
             Connector(
                 facing=0,
                 nextStructure=[
-                    'medium_hallway',
+                    # 'medium_hallway',
                     'medium_hub',
                     'narrow_exit',
-                    'narrow_hallway',
                     'narrow_hub',
                     'narrow_stairs_down',
                     'narrow_stairs_up',
                     'wide_greenhouse',
-                    'wide_hub',
+                    # 'wide_hub',
                 ]
             ),
             Connector(
                 facing=2,
                 nextStructure=[
-                    'medium_hallway',
+                    # 'medium_hallway',
                     'medium_hub',
                     'narrow_exit',
-                    'narrow_hallway',
                     'narrow_hub',
                     'narrow_stairs_down',
                     'narrow_stairs_up',
                     'wide_greenhouse',
-                    'wide_hub',
+                    # 'wide_hub',
                 ]
             )
         ]

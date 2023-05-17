@@ -60,7 +60,7 @@ class Node:
         self.structure.place()
 
     def doPostProcessingSteps(self):
-        self.structure.doPostProcessingSteps()
+        self.structure.doPostProcessingSteps(self)
 
     @property
     def hasOpenSlot(self) -> bool:
