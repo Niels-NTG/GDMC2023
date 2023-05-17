@@ -4,11 +4,11 @@ from typing import Optional
 from glm import ivec3
 
 import globals
-from StructureBase import Structure as StructureBase
+from StructureBase import Structure
 from Connector import Connector
 
 
-class NarrowShortBridge(StructureBase):
+class NarrowShortBridge(Structure):
 
     def __init__(
         self,
@@ -24,19 +24,29 @@ class NarrowShortBridge(StructureBase):
             Connector(
                 facing=0,
                 nextStructure=[
-                    'narrow_hub',
-                    'narrow_hallway',
+                    'medium_hallway',
+                    'medium_hub',
                     'narrow_exit',
-                    'narrow_bridge_arch_start'
+                    'narrow_hallway',
+                    'narrow_hub',
+                    'narrow_stairs_down',
+                    'narrow_stairs_up',
+                    'wide_greenhouse',
+                    'wide_hub',
                 ]
             ),
             Connector(
                 facing=2,
                 nextStructure=[
-                    'narrow_hub',
-                    'narrow_hallway',
+                    'medium_hallway',
+                    'medium_hub',
                     'narrow_exit',
-                    'narrow_bridge_arch_start'
+                    'narrow_hallway',
+                    'narrow_hub',
+                    'narrow_stairs_down',
+                    'narrow_stairs_up',
+                    'wide_greenhouse',
+                    'wide_hub',
                 ]
             )
         ]

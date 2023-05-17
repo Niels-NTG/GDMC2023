@@ -10,7 +10,7 @@ from Connector import Connector
 from gdpc.gdpc.block import Block
 
 
-class MediumHub(Structure):
+class NarrowHub(Structure):
 
     def __init__(
         self,
@@ -28,8 +28,6 @@ class MediumHub(Structure):
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                    'narrow_stairs_up',
-                    'narrow_stairs_down',
                 ]
             ),
             Connector(
@@ -37,8 +35,6 @@ class MediumHub(Structure):
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                    'narrow_stairs_up',
-                    'narrow_stairs_down',
                 ]
             ),
             Connector(
@@ -46,8 +42,6 @@ class MediumHub(Structure):
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                    'narrow_stairs_up',
-                    'narrow_stairs_down',
                 ]
             ),
             Connector(
@@ -55,14 +49,12 @@ class MediumHub(Structure):
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                    'narrow_stairs_up',
-                    'narrow_stairs_down',
                 ]
             )
         ]
 
     def evaluateStructure(self) -> float:
-        score = super().evaluateStructure()
+        cost = super().evaluateStructure()
 
         pillarCost = (
             self.position.y - worldTools.getHeightAt(
@@ -73,16 +65,19 @@ class MediumHub(Structure):
         if pillarCost < 0:
             # If pillar cost is negative, do not built underground
             return 0.0
-        score += pillarCost
+        cost += pillarCost
 
-        return score
+        return cost
 
     def doPostProcessingSteps(self):
         super().doPostProcessingSteps()
 
         # Place pillar
         pillarPos = self.boxInWorldSpace.middle
-        for y in range(worldTools.getHeightAt(pos=pillarPos, heightmapType='OCEAN_FLOOR_NO_PLANTS'), self.position.y):
+        for y in range(
+            worldTools.getHeightAt(pos=pillarPos, heightmapType='OCEAN_FLOOR_NO_PLANTS'),
+            self.position.y
+        ):
             globals.editor.placeBlockGlobal(
                 position=ivec3(pillarPos.x, y, pillarPos.z),
                 block=Block('minecraft:weathered_copper')

@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from StructureFolder import StructureFolder
     from StructureFile import StructureFile
 
-from glm import ivec3
+from glm import ivec3, ivec2
 
 import globals
 import worldTools
@@ -52,6 +52,10 @@ class Structure:
     @position.setter
     def position(self, value: ivec3):
         self._position = value
+
+    @property
+    def position2D(self) -> ivec2:
+        return ivec2(self.position.x, self.position.z)
 
     @property
     def facing(self) -> int:

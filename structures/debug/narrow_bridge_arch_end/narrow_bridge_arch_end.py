@@ -80,12 +80,12 @@ class NarrowBridgeArchEnd(StructureBase):
         pillarBox.offset.x = self.structureFile.sizeX - (pillarBox.offset.x + pillarBox.size.x)
 
         if self.facing > 0:
-            offset = vectorTools.rotatePointAroundOrigin(
+            offset = vectorTools.rotatePointAroundOrigin3D(
                 point=pillarBox.offset,
                 origin=self.structureFile.centerPivot,
                 rotation=self.facing
             )
-            size = vectorTools.rotatePointAroundOrigin(
+            size = vectorTools.rotatePointAroundOrigin3D(
                 point=pillarBox.end,
                 origin=self.structureFile.centerPivot,
                 rotation=self.facing

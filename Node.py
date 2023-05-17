@@ -8,7 +8,6 @@ from glm import ivec3
 import globals
 from Connector import Connector
 from StructureBase import Structure
-from gdpc.gdpc.vector_tools import Box
 import worldTools
 import vectorTools
 
@@ -123,12 +122,10 @@ class Node:
                     position=ivec3(0, 0, 0),
                 )
 
-                currentStructureBox: Box = self.structure.box
-                candidateStructureBox: Box = candidateStructure.box
                 nextPosition = vectorTools.getNextPosition(
                     facing=connectionRotation,
-                    currentBox=currentStructureBox,
-                    nextBox=candidateStructureBox
+                    currentBox=self.structure.box,
+                    nextBox=candidateStructure.box
                 ) + self.structure.position
                 candidateStructure.position = nextPosition + connectionOffset
 

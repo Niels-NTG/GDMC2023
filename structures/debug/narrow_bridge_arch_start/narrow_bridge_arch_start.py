@@ -79,12 +79,12 @@ class NarrowBridgeArchStart(StructureBase):
         pillarBox = Box(offset=ivec3(2, 0, 0), size=ivec3(3, 0, 5))
 
         if self.facing > 0:
-            offset = vectorTools.rotatePointAroundOrigin(
+            offset = vectorTools.rotatePointAroundOrigin3D(
                 point=pillarBox.offset,
                 origin=self.structureFile.centerPivot,
                 rotation=self.facing
             )
-            size = vectorTools.rotatePointAroundOrigin(
+            size = vectorTools.rotatePointAroundOrigin3D(
                 point=pillarBox.end,
                 origin=self.structureFile.centerPivot,
                 rotation=self.facing

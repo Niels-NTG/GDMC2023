@@ -28,7 +28,7 @@ def initialize():
 
 
 def loadStructureFiles():
-    namespace = 'debug'
+    namespace = 'gamma'
     for structureFolder in Path('.').glob(f'structures/{namespace}/*/'):
         if structureFolder.is_dir():
             structureName = structureFolder.name

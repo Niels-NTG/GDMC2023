@@ -4,13 +4,14 @@ from typing import Optional
 from glm import ivec3
 
 import globals
+import vectorTools
 import worldTools
-from StructureBase import Structure as StructureBase
+from StructureBase import Structure
 from Connector import Connector
 from gdpc.gdpc.block import Block
 
 
-class NarrowExit(StructureBase):
+class NarrowExit(Structure):
 
     def __init__(
         self,
@@ -26,36 +27,56 @@ class NarrowExit(StructureBase):
             Connector(
                 facing=2,
                 nextStructure=[
+                    'medium_hub',
+                    'medium_hallway',
+                    'wide_hub',
                     'narrow_hub',
-                    'narrow_hallway',
                     'narrow_short_bridge',
-                    'narrow_short_bridge_stairs_up',
-                    'narrow_short_bridge_stairs_down',
+                    'narrow_stairs_up',
+                    'narrow_stairs_down',
+                    'wide_greenhouse',
                 ]
             )
         ]
 
     def evaluateStructure(self) -> float:
-        score = super().evaluateStructure()
+        cost = super().evaluateStructure()
 
         pillarCost = (
-            self.position.y - worldTools.getHeightAt(pos=self.boxInWorldSpace.middle, heightmapType='OCEAN_FLOOR_NO_PLANTS')
+            self.position.y - worldTools.getHeightAt(
+                pos=self.boxInWorldSpace.middle,
+                heightmapType='OCEAN_FLOOR_NO_PLANTS'
+            )
         ) ** 2.0
         if pillarCost < 0.0:
             # If pillar cost is negative, do not built underground
             return 0.0
-        score += pillarCost
+        cost += pillarCost
 
-        return score
+        return cost
 
     def doPostProcessingSteps(self):
         super().doPostProcessingSteps()
 
         # Place pillar
-        pillarPosition = self.boxInWorldSpace.middle
-        for y in range(worldTools.getHeightAt(pos=pillarPosition, heightmapType='OCEAN_FLOOR_NO_PLANTS'), self.position.y):
+        pillarPos = self.boxInWorldSpace.middle
+        ladderPos = vectorTools.rotatePointAroundOrigin3D(
+            origin=pillarPos,
+            point=pillarPos + ivec3(1, 0, 0),
+            rotation=self.facing
+        )
+        for y in range(
+            worldTools.getHeightAt(pos=pillarPos, heightmapType='OCEAN_FLOOR_NO_PLANTS'),
+            self.position.y
+        ):
             globals.editor.placeBlockGlobal(
-                position=ivec3(pillarPosition.x, y, pillarPosition.z),
-                block=Block('minecraft:bricks')
+                position=ivec3(pillarPos.x, y, pillarPos.z),
+                block=Block('minecraft:weathered_copper')
             )
-        # TODO place ladder against pillar
+            globals.editor.placeBlockGlobal(
+                position=ivec3(ladderPos.x, y, ladderPos.z),
+                block=Block(
+                    id='minecraft:ladder',
+                    states={'facing': worldTools.facingBlockState(facing=self.facing + 1)}
+                )
+            )

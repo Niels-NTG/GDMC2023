@@ -211,3 +211,9 @@ def is2DPositionContainedInNodes(
         if nodeRect.centeredSubRect(size=nodeRect.size + 4).contains(pos):
             return True
     return False
+
+
+def facingBlockState(facing: int = 0) -> str:
+    facing = facing % 4
+    facingStates = ['east', 'south', 'west', 'north']
+    return facingStates[facing]
