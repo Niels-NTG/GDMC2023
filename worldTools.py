@@ -100,9 +100,9 @@ def getRandomSurfacePosition(
     heightmapType: str = DEFAULT_HEIGHTMAP_TYPE
 ) -> ivec3:
     startPosition = ivec3(
-        globals.buildarea.offset.x + rng.choice(globals.buildarea.size.x),
+        rng.integers(globals.buildarea.begin.x, globals.buildarea.end.x),
         0,
-        globals.buildarea.offset.y + rng.choice(globals.buildarea.size.y)
+        rng.integers(globals.buildarea.begin.y, globals.buildarea.end.y)
     )
     startPosition.y = getHeightAt(startPosition, heightmapType=heightmapType)
     return startPosition
