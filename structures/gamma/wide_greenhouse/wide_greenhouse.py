@@ -44,12 +44,12 @@ class WideGreenhouse(Structure):
     def evaluateStructure(self) -> float:
         score = super().evaluateStructure()
 
-        pillarCost = (
+        pillarCost = ((
             self.position.y - worldTools.getHeightAt(
                 pos=self.boxInWorldSpace.middle,
                 heightmapType='OCEAN_FLOOR_NO_PLANTS'
             )
-        ) * 4 ** 2.0
+        ) * 4) ** 2.0
         if pillarCost < 0:
             # If pillar cost is negative, do not built underground
             return 0.0
