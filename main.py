@@ -1,6 +1,5 @@
 from typing import Callable
 
-import glm
 import numpy as np
 from glm import ivec2, ivec3
 
@@ -161,32 +160,34 @@ def rewardFunction4(node: Node) -> float:
 
 # TODO also implement custom isTerminalFunction
 
+explorationConstant = np.sqrt(globals.buildarea.area) // 10
+print(f'exploration constant: {explorationConstant}')
+
 rootNode = Node(
     structure=rootStructure,
     rng=globalRNG,
     rewardFunction=rewardFunction1
 )
-# TODO change MCTS to use np.random instead of random library
-searcher1 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10, rng=globalRNG)
+searcher1 = MCTS(iterationLimit=40000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=explorationConstant, rng=globalRNG)
 searcher1.search(initialState=rootNode)
 nodeList1: list[Node] = searcher1.getBestRoute()
 finalizeTrace(nodeList1, 'route1')
 
-searcher2 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10, rng=globalRNG)
+searcher2 = MCTS(iterationLimit=40000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=explorationConstant, rng=globalRNG)
 rootNode2 = findConnectionNode(rewardFunction=rewardFunction2)
 rootNode2.rewardFunction = rewardFunction2
 searcher2.search(initialState=rootNode2)
 nodeList2: list[Node] = searcher2.getBestRoute()
 finalizeTrace(nodeList2, 'route2')
 
-searcher3 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10, rng=globalRNG)
+searcher3 = MCTS(iterationLimit=40000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=explorationConstant, rng=globalRNG)
 rootNode3 = findConnectionNode(rewardFunction=rewardFunction3)
 rootNode3.rewardFunction = rewardFunction3
 searcher3.search(initialState=rootNode3)
 nodeList3: list[Node] = searcher3.getBestRoute()
 finalizeTrace(nodeList3, 'route3')
 
-searcher4 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10, rng=globalRNG)
+searcher4 = MCTS(iterationLimit=40000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=explorationConstant, rng=globalRNG)
 rootNode4 = findConnectionNode(rewardFunction=rewardFunction4)
 rootNode4.rewardFunction = rewardFunction4
 searcher4.search(initialState=rootNode4)
