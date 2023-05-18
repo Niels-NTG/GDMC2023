@@ -42,7 +42,7 @@ def finalizeTrace(nodeList: list[Node], routeName: str = None):
         nextNode = None
         if index + 1 < len(nodeList):
             nextNode = nodeList[index + 1]
-        node.finalise(nextNode, routeName)
+        node.finalize(nextNode, routeName)
 
 
 def findConnectionNode(

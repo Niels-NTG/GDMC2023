@@ -46,7 +46,8 @@ class Node:
 
         self.possibleActions = None
 
-    def finalise(self, nextNode: Node = None, routeName: str = None):
+    def finalize(self, nextNode: Node = None, routeName: str = None):
+        self.possibleActions = None
         if nextNode:
             self.connectorSlots.add(nextNode.incomingConnector)
         if routeName:
