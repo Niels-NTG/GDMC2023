@@ -109,7 +109,6 @@ class Node:
             connectionRotation: int = (connector.facing + self.structure.facing) % 4
 
             nextStructures = connector.nextStructure
-            self.rng.shuffle(nextStructures)
             for candidateStructureName in nextStructures:
                 if candidateStructureName not in globals.structureFolders:
                     continue
