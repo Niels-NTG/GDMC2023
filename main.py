@@ -95,6 +95,20 @@ globals.editor.placeBlock(
 )
 print(f'Emerald block at {targetEmeraldBlockPosition}')
 
+targetRedMushroomBlockPosition = worldTools.getRandomSurfacePosition(globalRNG)
+globals.editor.placeBlock(
+    position=targetRedMushroomBlockPosition,
+    block=Block('red_mushroom_block')
+)
+print(f'Red mushroom block at {targetRedMushroomBlockPosition}')
+
+targetOrangeConcretePosition = worldTools.getRandomSurfacePosition(globalRNG)
+globals.editor.placeBlock(
+    position=targetOrangeConcretePosition,
+    block=Block('orange_concrete')
+)
+print(f'Orange concrete block at {targetOrangeConcretePosition}')
+
 globals.editor.placeBlock(
     position=worldTools.getSurfacePositionAt(globals.buildarea.begin),
     block=Block('red_concrete')
@@ -130,11 +144,19 @@ globals.editor.placeBlockGlobal(
 
 
 def rewardFunction1(node: Node) -> float:
-    return glm.distance(targetGoldBlockPosition.to_tuple(), node.structure.boxInWorldSpace.middle.to_tuple())
+    return float(np.sum(np.abs(targetGoldBlockPosition - node.structure.boxInWorldSpace.middle) * (1, 4, 1)))
 
 
 def rewardFunction2(node: Node) -> float:
-    return glm.distance(targetEmeraldBlockPosition.to_tuple(), node.structure.boxInWorldSpace.middle.to_tuple())
+    return float(np.sum(np.abs(targetEmeraldBlockPosition - node.structure.boxInWorldSpace.middle) * (1, 4, 1)))
+
+
+def rewardFunction3(node: Node) -> float:
+    return float(np.sum(np.abs(targetRedMushroomBlockPosition - node.structure.boxInWorldSpace.middle) * (1, 4, 1)))
+
+
+def rewardFunction4(node: Node) -> float:
+    return float(np.sum(np.abs(targetOrangeConcretePosition - node.structure.boxInWorldSpace.middle) * (1, 4, 1)))
 
 
 # TODO also implement custom isTerminalFunction
@@ -156,6 +178,20 @@ rootNode2.rewardFunction = rewardFunction2
 searcher2.search(initialState=rootNode2)
 nodeList2: list[Node] = searcher2.getBestRoute()
 finalizeTrace(nodeList2, 'route2')
+
+searcher3 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
+rootNode3 = findConnectionNode(rewardFunction=rewardFunction3)
+rootNode3.rewardFunction = rewardFunction3
+searcher3.search(initialState=rootNode3)
+nodeList3: list[Node] = searcher3.getBestRoute()
+finalizeTrace(nodeList3, 'route3')
+
+searcher4 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
+rootNode4 = findConnectionNode(rewardFunction=rewardFunction4)
+rootNode4.rewardFunction = rewardFunction4
+searcher4.search(initialState=rootNode4)
+nodeList4: list[Node] = searcher4.getBestRoute()
+finalizeTrace(nodeList4, 'route4')
 
 placeNodes()
 
