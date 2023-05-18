@@ -9,7 +9,6 @@ from Connector import Connector
 from Node import Node
 from StructureBase import Structure
 from gdpc.gdpc.block import Block
-from gdpc.gdpc.interface import placeStructure
 
 
 class NarrowHub(Structure):
@@ -30,32 +29,34 @@ class NarrowHub(Structure):
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                ]
+                ],
+                transitionStructure=self.transitionStructureFiles['door_east.nbt'],
             ),
             Connector(
                 facing=1,
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                ]
+                ],
+                transitionStructure=self.transitionStructureFiles['door_south.nbt'],
             ),
             Connector(
                 facing=2,
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                ]
+                ],
+                transitionStructure=self.transitionStructureFiles['door_east.nbt'],
             ),
             Connector(
                 facing=3,
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                ]
+                ],
+                transitionStructure=self.transitionStructureFiles['door_south.nbt'],
             )
         ]
-        self.eastDoorTransitionStructure = self.transitionStructureFiles['door_east.nbt']
-        self.southTransitionStructure = self.transitionStructureFiles['door_south.nbt']
 
     def evaluateStructure(self) -> float:
         cost = super().evaluateStructure()
@@ -85,15 +86,4 @@ class NarrowHub(Structure):
             globals.editor.placeBlockGlobal(
                 position=ivec3(pillarPos.x, y, pillarPos.z),
                 block=Block('minecraft:weathered_copper')
-            )
-
-        for connector in node.connectorSlots:
-            connectionRotation = (connector.facing + self.facing) % 4
-            transitionStructure = self.southTransitionStructure \
-                if connector.facing % 2 == 1 else self.eastDoorTransitionStructure
-            # noinspection PyTypeChecker
-            placeStructure(
-                transitionStructure.file,
-                position=self.position, rotate=connectionRotation, mirror=None,
-                pivot=transitionStructure.centerPivot
             )

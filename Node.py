@@ -40,7 +40,7 @@ class Node:
         self.connectorSlots = set()
         if parentConnector:
             self.incomingConnector = parentConnector
-            self.connectorSlots.add(Connector(facing=2))
+            self.connectorSlots.add(structure.rearFacingConnector)
 
         self.routeNames = set()
 

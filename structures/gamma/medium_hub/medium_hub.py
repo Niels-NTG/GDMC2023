@@ -10,7 +10,6 @@ from Connector import Connector
 from Node import Node
 from StructureBase import Structure
 from gdpc.gdpc.block import Block
-from gdpc.gdpc.interface import placeStructure
 
 
 class MediumHub(Structure):
@@ -31,31 +30,34 @@ class MediumHub(Structure):
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                ]
+                ],
+                transitionStructure=self.transitionStructureFiles['door.nbt'],
             ),
             Connector(
                 facing=1,
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                ]
+                ],
+                transitionStructure=self.transitionStructureFiles['door.nbt'],
             ),
             Connector(
                 facing=2,
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                ]
+                ],
+                transitionStructure=self.transitionStructureFiles['door.nbt'],
             ),
             Connector(
                 facing=3,
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                ]
+                ],
+                transitionStructure=self.transitionStructureFiles['door.nbt'],
             )
         ]
-        self.doorTransitionStructure = self.transitionStructureFiles['door.nbt']
 
     def evaluateStructure(self) -> float:
         cost = super().evaluateStructure()
@@ -97,12 +99,3 @@ class MediumHub(Structure):
                     position=ivec3(pillarPosition.x, y, pillarPosition.y),
                     block=Block('minecraft:weathered_copper')
                 )
-
-        for connector in node.connectorSlots:
-            connectionRotation = (connector.facing + self.facing) % 4
-            # noinspection PyTypeChecker
-            placeStructure(
-                self.doorTransitionStructure.file,
-                position=self.position, rotate=connectionRotation, mirror=None,
-                pivot=self.doorTransitionStructure.centerPivot
-            )

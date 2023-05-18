@@ -110,6 +110,13 @@ class Structure:
             return otherStructure.structureFile == self.structureFile
         return False
 
+    @property
+    def rearFacingConnector(self) -> Connector:
+        for connector in self.connectors:
+            if connector.facing == 2:
+                return connector
+        return Connector(facing=2)
+
     def evaluateStructure(self) -> float:
         cost = 1.0
 
@@ -135,7 +142,15 @@ class Structure:
         print(f"Placed {self} ({response}) at {self.position} facing {self.facing}")
 
     def doPostProcessingSteps(self, node: Node = None):
-        pass
+        for connector in node.connectorSlots:
+            if connector.transitionStructure is None:
+                continue
+            # noinspection PyTypeChecker
+            placeStructure(
+                connector.transitionStructure.file,
+                position=self.position, rotate=(connector.facing + self.facing) % 4, mirror=None,
+                pivot=connector.transitionStructure.centerPivot,
+            )
 
     def __eq__(self, other):
         return hash(self) == hash(other)
