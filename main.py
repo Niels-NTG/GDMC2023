@@ -167,26 +167,26 @@ rootNode = Node(
     rewardFunction=rewardFunction1
 )
 # TODO change MCTS to use np.random instead of random library
-searcher1 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
+searcher1 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10, rng=globalRNG)
 searcher1.search(initialState=rootNode)
 nodeList1: list[Node] = searcher1.getBestRoute()
 finalizeTrace(nodeList1, 'route1')
 
-searcher2 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
+searcher2 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10, rng=globalRNG)
 rootNode2 = findConnectionNode(rewardFunction=rewardFunction2)
 rootNode2.rewardFunction = rewardFunction2
 searcher2.search(initialState=rootNode2)
 nodeList2: list[Node] = searcher2.getBestRoute()
 finalizeTrace(nodeList2, 'route2')
 
-searcher3 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
+searcher3 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10, rng=globalRNG)
 rootNode3 = findConnectionNode(rewardFunction=rewardFunction3)
 rootNode3.rewardFunction = rewardFunction3
 searcher3.search(initialState=rootNode3)
 nodeList3: list[Node] = searcher3.getBestRoute()
 finalizeTrace(nodeList3, 'route3')
 
-searcher4 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10)
+searcher4 = MCTS(iterationLimit=10000, rolloutPolicy=mctsRolloutPolicy, explorationConstant=10, rng=globalRNG)
 rootNode4 = findConnectionNode(rewardFunction=rewardFunction4)
 rootNode4.rewardFunction = rewardFunction4
 searcher4.search(initialState=rootNode4)
