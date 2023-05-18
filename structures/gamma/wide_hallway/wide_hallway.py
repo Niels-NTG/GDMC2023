@@ -12,7 +12,7 @@ from StructureBase import Structure
 from gdpc.gdpc.block import Block
 
 
-class WideHub(Structure):
+class WideHallway(Structure):
 
     def __init__(
         self,
@@ -33,21 +33,7 @@ class WideHub(Structure):
                 ]
             ),
             Connector(
-                facing=1,
-                nextStructure=[
-                    'narrow_exit',
-                    'narrow_short_bridge',
-                ]
-            ),
-            Connector(
                 facing=2,
-                nextStructure=[
-                    'narrow_exit',
-                    'narrow_short_bridge',
-                ]
-            ),
-            Connector(
-                facing=3,
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',

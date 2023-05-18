@@ -30,13 +30,13 @@ class NarrowExit(Structure):
                 nextStructure=[
                     'medium_hub',
                     # 'medium_hallway',
-                    'wide_hub',
+                    # 'wide_hub',
                     'narrow_hub',
                     'narrow_short_bridge',
                     'narrow_stairs_up_1',
                     'narrow_stairs_up_2',
                     'narrow_stairs_down',
-                    'wide_greenhouse',
+                    # 'wide_greenhouse',
                 ]
             )
         ]
