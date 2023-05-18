@@ -88,9 +88,9 @@ class NarrowHub(Structure):
             )
 
         for connector in node.connectorSlots:
-            connectionRotation = (connector + self.facing) % 4
+            connectionRotation = (connector.facing + self.facing) % 4
             transitionStructure = self.southTransitionStructure \
-                if connector % 2 == 1 else self.eastDoorTransitionStructure
+                if connector.facing % 2 == 1 else self.eastDoorTransitionStructure
             # noinspection PyTypeChecker
             placeStructure(
                 transitionStructure.file,

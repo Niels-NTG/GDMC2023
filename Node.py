@@ -18,8 +18,8 @@ class Node:
     cost: float
     rewardFunction: Callable[[Node], float] | None
     rng: np.random.Generator
-    incomingConnector: int | None
-    connectorSlots: set[int]
+    incomingConnector: Connector | None
+    connectorSlots: set[Connector]
     routeNames: set[str]
     possibleActions: list[Action] | None
 
@@ -39,14 +39,15 @@ class Node:
         self.incomingConnector = None
         self.connectorSlots = set()
         if parentConnector:
-            self.incomingConnector = hash(parentConnector)
-            self.connectorSlots.add(2)
+            self.incomingConnector = parentConnector
+            self.connectorSlots.add(Connector(facing=2))
 
         self.routeNames = set()
 
         self.possibleActions = None
 
     def finalise(self, nextNode: Node = None, routeName: str = None):
+        # TODO placement of transition structures goes wrong because not all connectors are registered correctly
         if nextNode:
             self.connectorSlots.add(nextNode.incomingConnector)
         if routeName:
@@ -65,7 +66,7 @@ class Node:
     @property
     def hasOpenSlot(self) -> bool:
         for connector in self.structure.connectors:
-            if hash(connector) not in self.connectorSlots:
+            if connector not in self.connectorSlots:
                 return True
         return False
 
@@ -102,13 +103,10 @@ class Node:
         for connector in self.structure.connectors:
 
             # Check if slot isn't already occupied by other structure
-            connectorId = hash(connector)
-            if connectorId in self.connectorSlots:
+            if connector in self.connectorSlots:
                 continue
 
             connectionRotation: int = (connector.facing + self.structure.facing) % 4
-
-            connectionOffset = connector.offset
 
             nextStructures = connector.nextStructure
             self.rng.shuffle(nextStructures)
@@ -125,9 +123,10 @@ class Node:
                 nextPosition = vectorTools.getNextPosition(
                     facing=connectionRotation,
                     currentBox=self.structure.box,
-                    nextBox=candidateStructure.box
+                    nextBox=candidateStructure.box,
+                    offset=connector.offset,
                 ) + self.structure.position
-                candidateStructure.position = nextPosition + connectionOffset
+                candidateStructure.position = nextPosition
 
                 candidateStructureCost = self.evaluateCandidateNextStructure(candidateStructure)
                 if candidateStructureCost > 0:

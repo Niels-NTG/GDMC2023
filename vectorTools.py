@@ -7,14 +7,19 @@ from gdpc.gdpc.vector_tools import Box, Rect
 
 
 @functools.cache
-def getNextPosition(facing: int = 0, currentBox: Box = None, nextBox: Box = None) -> ivec3:
+def getNextPosition(
+    facing: int = 0,
+    currentBox: Box = None,
+    nextBox: Box = None,
+    offset: ivec3 = ivec3(0, 0, 0)
+) -> ivec3:
     if currentBox is None:
         currentBox = Box()
     if nextBox is None:
         nextBox = Box()
 
     currentCenter = ivec3(currentBox.center.x, currentBox.offset.y, currentBox.center.z)
-    nextCenter = ivec3(currentBox.size.x + nextBox.center.x, nextBox.offset.y, currentCenter.z)
+    nextCenter = ivec3(currentBox.size.x + nextBox.center.x, nextBox.offset.y, currentCenter.z) + offset
     nextPoint = rotatePointAroundOrigin3D(
         origin=currentCenter,
         point=nextCenter,

@@ -99,7 +99,7 @@ class MediumHub(Structure):
                 )
 
         for connector in node.connectorSlots:
-            connectionRotation = (connector + self.facing) % 4
+            connectionRotation = (connector.facing + self.facing) % 4
             # noinspection PyTypeChecker
             placeStructure(
                 self.doorTransitionStructure.file,
