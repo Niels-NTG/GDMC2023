@@ -24,7 +24,7 @@ def initialize():
     editor.loadWorldSlice(rect=buildarea, cache=True)
 
     global nodeList
-    nodeList = []
+    nodeList = set()
 
 
 def loadStructureFiles():

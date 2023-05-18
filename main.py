@@ -40,7 +40,7 @@ def mctsRolloutPolicy(state: Node, rng: np.random.Generator = np.random.default_
 def finalizeTrace(nodeList: list[Node], routeName: str = None):
     for index, node in enumerate(nodeList):
         nextNode = None
-        if index + 1 < len(nodeList) - 1:
+        if index + 1 < len(nodeList):
             nextNode = nodeList[index + 1]
         node.finalise(nextNode, routeName)
 

@@ -47,12 +47,11 @@ class Node:
         self.possibleActions = None
 
     def finalise(self, nextNode: Node = None, routeName: str = None):
-        # TODO placement of transition structures goes wrong because not all connectors are registered correctly
         if nextNode:
             self.connectorSlots.add(nextNode.incomingConnector)
         if routeName:
             self.routeNames.add(routeName)
-        globals.nodeList.append(self)
+        globals.nodeList.add(self)
 
     def doPreProcessingSteps(self):
         self.structure.doPreProcessingSteps()
