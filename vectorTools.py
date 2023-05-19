@@ -65,8 +65,8 @@ def isRectinRect(rectA: Rect, rectB: Rect) -> bool:
     return (
         rectB.begin.x >= rectA.begin.x and
         rectB.begin.y >= rectA.begin.y and
-        rectB.end.x <= rectA.end.x and
-        rectB.end.y <= rectA.end.y
+        rectB.end.x <= rectA.last.x and
+        rectB.end.y <= rectA.last.y
     )
 
 

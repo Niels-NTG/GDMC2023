@@ -4,6 +4,7 @@ import numpy as np
 from glm import ivec2, ivec3
 
 import globals
+import vectorTools
 from StructureBase import Structure
 from gdpc.gdpc.vector_tools import Box, Rect, loop2D
 from gdpc.gdpc.block import Block
@@ -31,12 +32,7 @@ def isStructureInsideBuildArea(structure: Structure) -> bool:
 
 
 def isBoxInsideBuildArea(box: Box) -> bool:
-    return (
-        box.begin.x >= globals.buildarea.begin.x and
-        box.begin.z >= globals.buildarea.begin.y and
-        box.end.x <= globals.buildarea.last.x and
-        box.end.z <= globals.buildarea.last.y
-    )
+    return vectorTools.isRectinRect(globals.buildarea, box.toRect())
 
 
 def isStructureTouchingSurface(
@@ -55,6 +51,17 @@ def isBoxTouchingSurface(
         if getHeightAt(pos=point, heightmapType=heightmapType) > box.offset.y:
             return True
     return False
+
+
+def getSurfaceStandardDeviation(
+    rect: Rect,
+    heightmapType: str = DEFAULT_HEIGHTMAP_TYPE
+) -> (float, int, int):
+    heightmapFragment: list[int] = []
+    points = rect.inner
+    for point in points:
+        heightmapFragment.append(getHeightAt(pos=point, heightmapType=heightmapType))
+    return float(np.std(heightmapFragment)), min(heightmapFragment), max(heightmapFragment)
 
 
 def getHeightAt(

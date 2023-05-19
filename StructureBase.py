@@ -139,7 +139,7 @@ class Structure:
             position=self.position, rotate=self.facing, mirror=None,
             pivot=self.structureFile.centerPivot
         )
-        print(f"Placed {self} ({response}) at {self.position} facing {self.facing}")
+        print(f'Placed {self}')
 
     def doPostProcessingSteps(self, node: Node = None):
         for connector in node.connectorSlots:
@@ -159,4 +159,4 @@ class Structure:
         return hash((self.structureFile, self.position, self.facing))
 
     def __repr__(self):
-        return f'{__class__.__name__} {self.structureFile} {self.position} {self.facing}'
+        return f'{self.structureFile} - position: {self.position}; facing: {self.facing}'
