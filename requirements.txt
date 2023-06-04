@@ -8,3 +8,4 @@ termcolor==2.2.0
 opencv-python~=4.7.0.68
 setuptools~=65.6.3
 pyGLM==2.7.0
+nbtlib==2.0.4

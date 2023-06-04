@@ -1,14 +1,17 @@
 import re
+from typing import Iterator
 
+import nbtlib
 import numpy as np
 from glm import ivec2, ivec3
 
 import globals
+import nbtTools
 import vectorTools
 from StructureBase import Structure
-from gdpc.gdpc.vector_tools import Box, Rect, loop2D
+from gdpc.gdpc import lookup, interface
 from gdpc.gdpc.block import Block
-from gdpc.gdpc import lookup
+from gdpc.gdpc.vector_tools import Box, Rect, loop2D
 
 DEFAULT_HEIGHTMAP_TYPE: str = 'MOTION_BLOCKING_NO_PLANTS'
 
@@ -25,6 +28,61 @@ class PlacementInstruction:
 
     def __hash__(self):
         return hash(self.position)
+
+
+class SimpleEntity:
+
+    def __init__(
+        self,
+        uuid: str,
+        snbt: str = None,
+    ):
+        self.uuid = uuid
+        if snbt:
+            self._nbt = nbtTools.SnbttoNbt(snbt)
+            self._position = nbtTools.extractEntityBlockPos(self._nbt)
+            self._id = nbtTools.extractEntityId(self._nbt)
+
+    @property
+    def position(self) -> ivec3 | None:
+        if self._position:
+            return self._position
+
+    @property
+    def id(self) -> str:
+        if self._id:
+            return self._id
+        return ''
+
+    @property
+    def nbt(self) -> nbtlib.Compound:
+        if self._nbt:
+            return self._nbt
+        return nbtlib.Compound()
+
+    @property
+    def isFriendlyMob(self) -> bool:
+        if self.id:
+            return self.id in lookup.PASSIVE_MOBS
+        return False
+
+    @property
+    def isHostileMob(self) -> bool:
+        if self.id:
+            return self.id in lookup.HOSTILE_MOBS
+        return False
+
+    @property
+    def isAboveGround(self) -> bool:
+        if self.position:
+            try:
+                return self.position.y >= getHeightAt(pos=self.position, heightmapType='OCEAN_FLOOR')
+            except IndexError:
+                return False
+        return False
+
+    def __hash__(self):
+        return hash(self.nbt)
 
 
 def isStructureInsideBuildArea(structure: Structure) -> bool:
@@ -220,7 +278,55 @@ def is2DPositionContainedInNodes(
     return False
 
 
+def buildAreaSqrt() -> float:
+    return np.sqrt(globals.buildarea.area)
+
+
 def facingBlockState(facing: int = 0) -> str:
     facing = facing % 4
     facingStates = ['east', 'south', 'west', 'north']
     return facingStates[facing]
+
+
+def getEntities(
+    area: Box = None,
+    query: dict = None,
+    includeData: bool = False,
+    dimension: str = None
+) -> list[SimpleEntity]:
+    foundEntities = []
+    for subAreaSelectorQuery in getEntitySelectorQuery(area, query):
+        foundEntities.extend(
+            interface.getEntities(
+                selector=subAreaSelectorQuery,
+                includeData=includeData,
+                dimension=dimension,
+            )
+        )
+    entityList: list[SimpleEntity] = []
+    for entity in foundEntities:
+        entityList.append(SimpleEntity(
+            uuid=entity.get('uuid'),
+            snbt=entity.get('data'),
+        ))
+    return entityList
+
+
+def getEntitySelectorQuery(area: Box = None, query: dict = None) -> Iterator[str]:
+    if area is None:
+        area = globals.editor.worldSlice.box
+    if query is None:
+        query = dict()
+
+    for subArea in vectorTools.loop2DwithRects(
+        begin=area.toRect().begin,
+        end=area.toRect().end,
+        stride=ivec2(128, 128)
+    ):
+        query['x'] = subArea.offset.x
+        query['y'] = area.offset.y
+        query['z'] = subArea.offset.y
+        query['dx'] = subArea.size.x
+        query['dy'] = area.size.y
+        query['dz'] = subArea.size.y
+        yield f"@e[{','.join([f'{key}={value}' for key, value in query.items()])}]"

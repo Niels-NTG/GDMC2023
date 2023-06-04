@@ -7,10 +7,11 @@ if TYPE_CHECKING:
 import numpy as np
 
 import globals
+import worldTools
 
 
 def explorationConstant() -> float:
-    return np.sqrt(globals.buildarea.area) // 10
+    return worldTools.buildAreaSqrt() / 10
 
 
 # TODO also implement custom isTerminalFunction

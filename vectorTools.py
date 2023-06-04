@@ -1,6 +1,8 @@
 import functools
+from typing import Iterator
 
 import numpy as np
+import glm
 from glm import ivec3, ivec2
 
 from gdpc.gdpc.vector_tools import Box, Rect
@@ -73,3 +75,35 @@ def isRectinRect(rectA: Rect, rectB: Rect) -> bool:
 @functools.cache
 def addVec2ToVec3(a: ivec2 = ivec2(0, 0), b: ivec2 = ivec2(0, 0), y: int = 0) -> ivec3:
     return ivec3(a.x + b.x, y, a.y + b.y)
+
+
+@functools.cache
+def loop2DwithStride(
+    begin: ivec2 = ivec2(0, 0),
+    end: ivec2 = ivec2(0, 0),
+    stride: ivec2 | int = ivec2(1, 1)
+) -> Iterator[ivec2]:
+    if isinstance(stride, int):
+        stride = ivec2(1, 1) * stride
+    for x in range(begin.x, end.x, stride.x):
+        for y in range(begin.y, end.y, stride.y):
+            yield ivec2(x, y)
+
+
+@functools.cache
+def loop2DwithRects(
+    begin: ivec2 = ivec2(0, 0),
+    end: ivec2 = ivec2(0, 0),
+    stride: ivec2 = ivec2(1, 1)
+) -> Iterator[Rect]:
+    for x in range(begin.x, end.x, stride.x):
+        for y in range(begin.y, end.y, stride.y):
+            newRectOffset = ivec2(x, y)
+            newRectSize = stride
+            # noinspection PyTypeChecker
+            newRect = Rect(
+                offset=newRectOffset,
+                size=newRectSize
+            )
+            newRect.end = glm.min(newRect.end, end)
+            yield newRect
