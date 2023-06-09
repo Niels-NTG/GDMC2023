@@ -1,5 +1,4 @@
 import re
-from typing import Iterator
 
 import nbtlib
 import numpy as np
@@ -83,6 +82,26 @@ class SimpleEntity:
 
     def __hash__(self):
         return hash(self.nbt)
+
+
+class EntitiesPerArea:
+
+    def __init__(
+        self,
+        area: Box,
+        entityList: list[SimpleEntity] = None,
+    ):
+        self.area = area
+        self.entityList = entityList if entityList else []
+
+    def __len__(self):
+        return len(self.entityList)
+
+    def __hash__(self):
+        return hash(self.area)
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
 
 
 def isStructureInsideBuildArea(structure: Structure) -> bool:
@@ -292,17 +311,13 @@ def getEntities(
     area: Box = None,
     query: dict = None,
     includeData: bool = False,
-    dimension: str = None
+    dimension: str = None,
 ) -> list[SimpleEntity]:
-    foundEntities = []
-    for subAreaSelectorQuery in getEntitySelectorQuery(area, query):
-        foundEntities.extend(
-            interface.getEntities(
-                selector=subAreaSelectorQuery,
-                includeData=includeData,
-                dimension=dimension,
-            )
-        )
+    foundEntities = interface.getEntities(
+        selector=getEntitySelectorQuery(area, query),
+        includeData=includeData,
+        dimension=dimension,
+    )
     entityList: list[SimpleEntity] = []
     for entity in foundEntities:
         entityList.append(SimpleEntity(
@@ -312,21 +327,46 @@ def getEntities(
     return entityList
 
 
-def getEntitySelectorQuery(area: Box = None, query: dict = None) -> Iterator[str]:
+def getEntitiesPerGrid(
+    area: Box = None,
+    query: dict = None,
+    includeData: bool = False,
+    dimension: str = None,
+    gridSize: ivec2 = ivec2(128, 128),
+) -> list[EntitiesPerArea]:
+    if area is None:
+        area = globals.editor.worldSlice.box
+    entityListPerArea: list[EntitiesPerArea] = []
+    for subArea in vectorTools.loop2DwithRects(
+        begin=area.toRect().begin,
+        end=area.toRect().end,
+        stride=gridSize,
+    ):
+        # noinspection PyTypeChecker
+        searchBox = Box(
+            offset=ivec3(subArea.offset.x, area.offset.y, subArea.offset.y),
+            size=ivec3(subArea.size.x, area.size.y, subArea.size.y),
+        )
+        entityList = getEntities(area=searchBox, query=query, includeData=includeData, dimension=dimension)
+        if len(entityList) > 0:
+            entityListPerArea.append(
+                EntitiesPerArea(
+                    area=searchBox,
+                    entityList=entityList,
+                )
+            )
+    return entityListPerArea
+
+
+def getEntitySelectorQuery(area: Box = None, query: dict = None) -> str:
     if area is None:
         area = globals.editor.worldSlice.box
     if query is None:
         query = dict()
-
-    for subArea in vectorTools.loop2DwithRects(
-        begin=area.toRect().begin,
-        end=area.toRect().end,
-        stride=ivec2(128, 128)
-    ):
-        query['x'] = subArea.offset.x
-        query['y'] = area.offset.y
-        query['z'] = subArea.offset.y
-        query['dx'] = subArea.size.x
-        query['dy'] = area.size.y
-        query['dz'] = subArea.size.y
-        yield f"@e[{','.join([f'{key}={value}' for key, value in query.items()])}]"
+    query['x'] = area.offset.x
+    query['y'] = area.offset.y
+    query['z'] = area.offset.z
+    query['dx'] = area.size.x
+    query['dy'] = area.size.y
+    query['dz'] = area.size.z
+    return f"@e[{','.join([f'{key}={value}' for key, value in query.items()])}]"
