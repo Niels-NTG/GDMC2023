@@ -17,6 +17,7 @@ class Node:
     structure: Structure
     cost: float
     rewardFunction: Callable[[Node], float] | None
+    terminationFunction: Callable[[Node], bool] | None
     rng: np.random.Generator
     incomingConnector: Connector | None
     connectorSlots: set[Connector]
@@ -29,11 +30,14 @@ class Node:
         cost: float = 0.0,
         parentConnector: Connector | None = None,
         rewardFunction: Callable[[Node], float] = None,
+        terminationFunction: Callable[[Node], bool] = None,
         rng: np.random.Generator = np.random.default_rng(),
     ):
         self.structure = structure
         self.cost = cost
         self.rewardFunction = rewardFunction
+        self.terminationFunction = terminationFunction
+
         self.rng = rng
 
         self.incomingConnector = None
@@ -148,7 +152,9 @@ class Node:
         )
 
     def isTerminal(self) -> bool:
-        if self.rewardFunction(self) < 4:
+        if self.terminationFunction and self.terminationFunction(self):
+            return True
+        if self.rewardFunction and self.rewardFunction(self) <= 0:
             return True
         if len(self.getPossibleActions()) == 0:
             return True

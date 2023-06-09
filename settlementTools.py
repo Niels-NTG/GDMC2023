@@ -14,9 +14,6 @@ def explorationConstant() -> float:
     return worldTools.buildAreaSqrt() / 10
 
 
-# TODO also implement custom isTerminalFunction
-
-
 def mctsRolloutPolicy(state: Node, rng: np.random.Generator = np.random.default_rng()) -> float:
     while not state.isTerminal():
         try:
