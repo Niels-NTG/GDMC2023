@@ -1,12 +1,13 @@
 import numpy as np
+from glm import ivec3
 
 import globals
 import worldTools
-from MCTS.mcts import MCTS
 from Node import Node
 from RootNode import RootNode
 from gdpc.gdpc import Block
 import settlementTools
+from structures.gamma.tower_hub.tower_hub import TowerHub
 
 
 class DebugSettlement:
@@ -31,36 +32,29 @@ class DebugSettlement:
         def rewardFunction1(node: Node) -> float:
             return float(np.sum(np.abs(targets[0][0] - node.structure.boxInWorldSpace.middle) * (1, 2, 1)))
         rootNode1 = RootNode(
-            nodeRewardFunction=rewardFunction1,
+            structure=TowerHub(
+                position=ivec3(0, 0, 0),
+                facing=rng.integers(4),
+            ),
             rng=rng,
+            rewardFunction=rewardFunction1,
         )
-        self.runSearcher(rootNode1, targets[0][1].id)
+        settlementTools.runSearcher(rootNode1, rng, targets[0][1].id)
 
         def rewardFunction2(node: Node) -> float:
             return float(np.sum(np.abs(targets[1][0] - node.structure.boxInWorldSpace.middle) * (1, 2, 1)))
-        rootNode2 = settlementTools.findConnectionNode(rewardFunction=rewardFunction2)
+        rootNode2 = settlementTools.findConnectionNodeGlobal(rewardFunction=rewardFunction2)
         rootNode2.rewardFunction = rewardFunction2
-        self.runSearcher(rootNode2, targets[1][1].id)
+        settlementTools.runSearcher(rootNode2, rng, targets[1][1].id)
 
         def rewardFunction3(node: Node) -> float:
             return float(np.sum(np.abs(targets[2][0] - node.structure.boxInWorldSpace.middle) * (1, 2, 1)))
-        rootNode3 = settlementTools.findConnectionNode(rewardFunction=rewardFunction3)
+        rootNode3 = settlementTools.findConnectionNodeGlobal(rewardFunction=rewardFunction3)
         rootNode3.rewardFunction = rewardFunction3
-        self.runSearcher(rootNode3, targets[2][1].id)
+        settlementTools.runSearcher(rootNode3, rng, targets[2][1].id)
 
         def rewardFunction4(node: Node) -> float:
             return float(np.sum(np.abs(targets[3][0] - node.structure.boxInWorldSpace.middle) * (1, 2, 1)))
-        rootNode4 = settlementTools.findConnectionNode(rewardFunction=rewardFunction4)
+        rootNode4 = settlementTools.findConnectionNodeGlobal(rewardFunction=rewardFunction4)
         rootNode4.rewardFunction = rewardFunction4
-        self.runSearcher(rootNode4, targets[3][1].id)
-
-    def runSearcher(self, rootNode: Node, targetName: str):
-        searcher = MCTS(
-            iterationLimit=40000,
-            rolloutPolicy=settlementTools.mctsRolloutPolicy,
-            explorationConstant=settlementTools.explorationConstant(),
-            rng=self.rng,
-        )
-        searcher.search(initialState=rootNode)
-        nodeList: list[Node] = searcher.getBestRoute()
-        settlementTools.finalizeTrace(nodeList, targetName)
+        settlementTools.runSearcher(rootNode4, rng, targets[3][1].id)

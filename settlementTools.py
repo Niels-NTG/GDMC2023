@@ -8,9 +8,34 @@ import numpy as np
 
 import globals
 import worldTools
+from MCTS.mcts import MCTS
+from RootNode import RootNode
 
 
-def explorationConstant() -> float:
+def runSearcher(
+    rootNode: Node,
+    rng: np.random.Generator = np.random.default_rng(),
+    targetName: str = '',
+    iterationLimit: int = 40000,
+    explorationConstant: float = 1 / np.sqrt(2),
+) -> list[Node]:
+    searcher = MCTS(
+        iterationLimit=iterationLimit,
+        rolloutPolicy=mctsRolloutPolicy,
+        explorationConstant=explorationConstant,
+        rng=rng,
+    )
+    searcher.search(initialState=rootNode)
+    nodeList: list[Node] = []
+    for node in searcher.getBestRoute():
+        if isinstance(node, RootNode):
+            continue
+        nodeList.append(node)
+    finalizeTrace(nodeList, targetName)
+    return nodeList
+
+
+def explorationConstantWorldScale() -> float:
     return worldTools.buildAreaSqrt() / 10
 
 
@@ -43,11 +68,25 @@ def finalizeTrace(nodeList: list[Node], routeName: str = None):
 
 
 def findConnectionNode(
+    rewardFunction: Callable[[Node], float] = None,
+    nodeList: list[Node] = None,
+) -> Node:
+    if nodeList is None or len(nodeList) == 0:
+        raise Exception('Could not fit node with open connection slot')
+    candidateNodes: list[Node] = []
+    rewards: list[float] = []
+    for finalizedNode in nodeList:
+        if finalizedNode.hasOpenSlot:
+            candidateNodes.append(finalizedNode)
+            rewards.append(rewardFunction(finalizedNode))
+    if len(candidateNodes) == 0:
+        raise Exception('Could not fit node with open connection slot')
+    return candidateNodes[np.argmin(rewards)]
+
+
+def findConnectionNodeGlobal(
     rewardFunction: Callable[[Node], float] = None
 ) -> Node:
-    # TODO instead of picking the closest node, pick a subset of all open nodes (top "n" reward)
-    #   and use that as the list of possible candidates from an empty root node (make new root
-    #   node class for this particular use case).
     candidateNodes: list[Node] = []
     rewards: list[float] = []
     for finalizedNode in globals.nodeList:
