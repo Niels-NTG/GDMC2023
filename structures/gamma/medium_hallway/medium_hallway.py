@@ -18,13 +18,18 @@ class MediumHallway(Structure):
         self,
         position: Optional[ivec3],
         facing: int = 0,
+        settlementType: str = None,
     ):
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
             facing=facing,
+            settlementType=settlementType,
         )
-        self.connectors = [
+
+    @property
+    def connectors(self) -> list[Connector]:
+        return [
             Connector(
                 facing=0,
                 nextStructure=[

@@ -1,4 +1,9 @@
+from __future__ import annotations
+
 import re
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from StructureBase import Structure
 
 import nbtlib
 import numpy as np
@@ -7,7 +12,6 @@ from glm import ivec2, ivec3
 import globals
 import nbtTools
 import vectorTools
-from StructureBase import Structure
 from gdpc.gdpc import lookup, interface
 from gdpc.gdpc.block import Block
 from gdpc.gdpc.vector_tools import Box, Rect, loop2D

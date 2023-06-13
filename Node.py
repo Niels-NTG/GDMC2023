@@ -18,6 +18,7 @@ class Node:
     cost: float
     rewardFunction: Callable[[Node], float] | None
     terminationFunction: Callable[[Node], bool] | None
+    settlementType: str | None
     rng: np.random.Generator
     incomingConnector: Connector | None
     connectorSlots: set[Connector]
@@ -31,12 +32,14 @@ class Node:
         parentConnector: Connector | None = None,
         rewardFunction: Callable[[Node], float] = None,
         terminationFunction: Callable[[Node], bool] = None,
+        settlementType: str = None,
         rng: np.random.Generator = np.random.default_rng(),
     ):
         self.structure = structure
         self.cost = cost
         self.rewardFunction = rewardFunction
         self.terminationFunction = terminationFunction
+        self.settlementType = settlementType
 
         self.rng = rng
 
@@ -74,9 +77,8 @@ class Node:
                 return True
         return False
 
-    @staticmethod
-    def evaluateCandidateNextStructure(candidateStructure: Structure = None) -> float:
-        if candidateStructure is None:
+    def evaluateCandidateNextStructure(self, candidateStructure: Structure = None) -> float:
+        if self.actionFilter and self.actionFilter(candidateStructure) is False:
             return 0.0
 
         if worldTools.isStructureInsideBuildArea(candidateStructure) is False:
@@ -115,12 +117,14 @@ class Node:
             nextStructures = connector.nextStructure
             for candidateStructureName in nextStructures:
                 if candidateStructureName not in globals.structureFolders:
+                    print(f'Structure file {candidateStructureName} does not exist')
                     continue
                 structureFolder = globals.structureFolders[candidateStructureName]
                 # noinspection PyCallingNonCallable
                 candidateStructure: Structure = structureFolder.structureClass(
                     facing=connectionRotation,
                     position=ivec3(0, 0, 0),
+                    settlementType=self.settlementType,
                 )
 
                 nextPosition = vectorTools.getNextPosition(

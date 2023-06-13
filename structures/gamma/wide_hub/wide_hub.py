@@ -18,13 +18,20 @@ class WideHub(Structure):
         self,
         position: Optional[ivec3],
         facing: int = 0,
+        settlementType: str = None,
     ):
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
             facing=facing,
+            settlementType=settlementType,
         )
-        self.connectors = [
+        self.southEastDoorStructure = self.transitionStructureFiles['south_east_door.nbt']
+        self.southWestDoorStructure = self.transitionStructureFiles['south_west_door.nbt']
+
+    @property
+    def connectors(self) -> list[Connector]:
+        return [
             Connector(
                 facing=0,
                 nextStructure=[
@@ -39,7 +46,7 @@ class WideHub(Structure):
                     'narrow_exit',
                     'narrow_short_bridge',
                 ],
-                transitionStructure=self.transitionStructureFiles['south_west_door.nbt'],
+                transitionStructure=self.southWestDoorStructure,
             ),
             Connector(
                 facing=1,
@@ -48,7 +55,7 @@ class WideHub(Structure):
                     'narrow_exit',
                     'narrow_short_bridge',
                 ],
-                transitionStructure=self.transitionStructureFiles['south_east_door.nbt'],
+                transitionStructure=self.southEastDoorStructure,
             ),
             Connector(
                 facing=2,
@@ -64,7 +71,7 @@ class WideHub(Structure):
                     'narrow_exit',
                     'narrow_short_bridge',
                 ],
-                transitionStructure=self.transitionStructureFiles['south_west_door.nbt'],
+                transitionStructure=self.southWestDoorStructure,
             ),
             Connector(
                 facing=3,
@@ -73,11 +80,9 @@ class WideHub(Structure):
                     'narrow_exit',
                     'narrow_short_bridge',
                 ],
-                transitionStructure=self.transitionStructureFiles['south_east_door.nbt'],
+                transitionStructure=self.southEastDoorStructure,
             )
         ]
-        self.southEastDoorStructure = self.transitionStructureFiles['south_east_door.nbt']
-        self.southWestDoorStructure = self.transitionStructureFiles['south_west_door.nbt']
 
     def evaluateStructure(self) -> float:
         cost = super().evaluateStructure()
