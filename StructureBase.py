@@ -24,6 +24,8 @@ class Structure:
     transitionStructureFiles: dict[str, StructureFile]
     structureFile: StructureFile
 
+    settlementType: str | None
+
     preProcessingSteps: list[worldTools.PlacementInstruction]
 
     _position: ivec3
@@ -34,17 +36,23 @@ class Structure:
         structureFolder: StructureFolder,
         position: ivec3,
         facing: int = 0,
+        settlementType: str = None,
     ):
 
         self.structureFile = structureFolder.structureFile
         self.transitionStructureFiles = structureFolder.transitionStructureFiles
         self.decorationStructureFiles = structureFolder.decorationStructureFiles
-        self.connectors = []
+
+        self.settlementType = settlementType
 
         self.preProcessingSteps = []
 
         self.position = position
         self.facing = facing
+
+    @property
+    def connectors(self) -> list[Connector]:
+        return []
 
     @property
     def position(self) -> ivec3:

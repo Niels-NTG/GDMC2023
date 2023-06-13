@@ -18,25 +18,28 @@ class NarrowExit(Structure):
         self,
         position: Optional[ivec3],
         facing: int = 0,
+        settlementType: str = None,
     ):
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
             facing=facing,
+            settlementType=settlementType,
         )
-        self.connectors = [
+
+    @property
+    def connectors(self) -> list[Connector]:
+        return [
             Connector(
                 facing=2,
                 nextStructure=[
                     'medium_hub',
-                    # 'medium_hallway',
-                    # 'wide_hub',
                     'narrow_hub',
                     'narrow_short_bridge',
                     'narrow_stairs_up_1',
                     'narrow_stairs_up_2',
-                    'narrow_stairs_down',
-                    # 'wide_greenhouse',
+                    'narrow_stairs_down_1',
+                    'narrow_stairs_down_2',
                 ]
             )
         ]

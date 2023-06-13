@@ -18,13 +18,20 @@ class WideGreenhouse(Structure):
         self,
         position: Optional[ivec3],
         facing: int = 0,
+        settlementType: str = None,
     ):
         super().__init__(
             structureFolder=globals.structureFolders[Path(__file__).parent.name],
             position=position,
             facing=facing,
+            settlementType=settlementType,
         )
-        self.connectors = [
+
+        self.customProperties['foodUnits'] = 6
+
+    @property
+    def connectors(self) -> list[Connector]:
+        return [
             Connector(
                 facing=0,
                 nextStructure=[
@@ -59,6 +66,8 @@ class WideGreenhouse(Structure):
 
     def doPostProcessingSteps(self, node: Node = None):
         super().doPostProcessingSteps(node)
+
+        # TODO permute type of crops
 
         # Place pillar
         pillarPositions: list[ivec2] = [
