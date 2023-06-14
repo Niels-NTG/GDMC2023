@@ -48,7 +48,7 @@ class DebugSettlement:
 
         def rewardFunction2(node: Node) -> float:
             return float(np.sum(np.abs(targets[1][0] - node.structure.boxInWorldSpace.middle) * (1, 2, 1)))
-        rootNode2 = settlementTools.findConnectionNodeGlobal(rewardFunction=rewardFunction2)
+        rootNode2 = settlementTools.findConnectionNodeByRewardValueGlobal(rewardFunction=rewardFunction2)
         rootNode2.rewardFunction = rewardFunction2
         settlementTools.runSearcher(
             rootNode=rootNode2,
@@ -59,7 +59,7 @@ class DebugSettlement:
 
         def rewardFunction3(node: Node) -> float:
             return float(np.sum(np.abs(targets[2][0] - node.structure.boxInWorldSpace.middle) * (1, 2, 1)))
-        rootNode3 = settlementTools.findConnectionNodeGlobal(rewardFunction=rewardFunction3)
+        rootNode3 = settlementTools.findConnectionNodeByRewardValueGlobal(rewardFunction=rewardFunction3)
         rootNode3.rewardFunction = rewardFunction3
         settlementTools.runSearcher(
             rootNode=rootNode3,
@@ -70,7 +70,7 @@ class DebugSettlement:
 
         def rewardFunction4(node: Node) -> float:
             return float(np.sum(np.abs(targets[3][0] - node.structure.boxInWorldSpace.middle) * (1, 2, 1)))
-        rootNode4 = settlementTools.findConnectionNodeGlobal(rewardFunction=rewardFunction4)
+        rootNode4 = settlementTools.findConnectionNodeByRewardValueGlobal(rewardFunction=rewardFunction4)
         rootNode4.rewardFunction = rewardFunction4
         settlementTools.runSearcher(
             rootNode=rootNode4,

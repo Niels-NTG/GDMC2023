@@ -64,7 +64,34 @@ def finalizeTrace(nodeList: list[Node], routeName: str = None):
         node.finalize(nextNode, routeName)
 
 
-def findConnectionNode(
+def findRandomConnectionNode(
+    rng: np.random.Generator = np.random.default_rng(),
+    nodeList: list[Node] = None,
+) -> Node:
+    if nodeList is None or len(nodeList) == 0:
+        raise Exception('Could not fit node with open connection slot')
+    candidateNodes: list[Node] = []
+    for finalizedNode in nodeList:
+        if finalizedNode.hasOpenSlot:
+            candidateNodes.append(finalizedNode)
+    if len(candidateNodes) == 0:
+        raise Exception('Could not fit node with open connection slot')
+    return rng.choice(candidateNodes)
+
+
+def findRandomConnectionNodeGlobal(
+    rng: np.random.Generator = np.random.default_rng()
+) -> Node:
+    candidateNodes: list[Node] = []
+    for finalizedNode in globals.nodeList:
+        if finalizedNode.hasOpenSlot:
+            candidateNodes.append(finalizedNode)
+    if len(candidateNodes) == 0:
+        raise Exception('Could not fit node with open connection slot')
+    return rng.choice(candidateNodes)
+
+
+def findConnectionNodeByRewardValue(
     rewardFunction: Callable[[Node], float] = None,
     nodeList: list[Node] = None,
 ) -> Node:
@@ -81,7 +108,7 @@ def findConnectionNode(
     return candidateNodes[np.argmin(rewards)]
 
 
-def findConnectionNodeGlobal(
+def findConnectionNodeByRewardValueGlobal(
     rewardFunction: Callable[[Node], float] = None
 ) -> Node:
     candidateNodes: list[Node] = []

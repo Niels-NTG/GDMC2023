@@ -35,6 +35,7 @@ class Node:
         self,
         structure: Structure = None,
         cost: float = 0.0,
+        parentNode: Node | None = None,
         parentConnector: Connector | None = None,
         rewardFunction: Callable[[Node], float] = None,
         terminationFunction: Callable[[Node], bool] = None,
@@ -60,7 +61,9 @@ class Node:
         self.connectorSlots = set()
         if parentConnector:
             self.incomingConnector = parentConnector
-            self.connectorSlots.add(structure.rearFacingConnector)
+            rearFacingConnector = structure.rearFacingConnector
+            rearFacingConnector.finalNode = parentNode
+            self.connectorSlots.add(rearFacingConnector)
 
         self.routeNames = set()
 
@@ -81,6 +84,7 @@ class Node:
     def finalize(self, nextNode: Node = None, routeName: str = None):
         self.possibleActions = None
         if nextNode:
+            nextNode.incomingConnector.finalNode = nextNode
             self.connectorSlots.add(nextNode.incomingConnector)
         if routeName:
             self.routeNames.add(routeName)
@@ -129,12 +133,26 @@ class Node:
     def getPossibleActions(self) -> list[Action]:
         if self.possibleActions is not None:
             return self.possibleActions
-        possibleActions = []
+        possibleActions: list[Action] = []
 
         for connector in self.structure.connectors:
 
-            # Check if slot isn't already occupied by other structure
+            # Check if slot isn't already occupied by other node
             if connector in self.connectorSlots:
+                # Skip the rear-facing connector to prevent searching through parent nodes
+                if connector == self.structure.rearFacingConnector:
+                    continue
+                # Use existing node instead of creating a new one
+                matchingConnector: Connector | None = None
+                for connectorSlot in self.connectorSlots:
+                    if connectorSlot == connector:
+                        matchingConnector = connectorSlot
+                        break
+                if matchingConnector and matchingConnector.finalNode:
+                    possibleActions.append(Action(
+                        existingNode=matchingConnector.finalNode,
+                        connector=matchingConnector,
+                    ))
                 continue
 
             connectionRotation: int = (connector.facing + self.structure.facing) % 4
@@ -172,9 +190,20 @@ class Node:
         return possibleActions
 
     def takeAction(self, action: Action) -> Node:
+        if action.existingNode:
+            action.existingNode.cost = action.cost
+            action.existingNode.rewardFunction = self.rewardFunction
+            action.existingNode.terminationFunction = self.terminationFunction
+            action.existingNode.actionFilter = self.actionFilter
+            action.existingNode.settlementType = self.settlementType
+            action.existingNode.bookKeepingProperties = deepcopy(self.bookKeepingProperties)
+            action.existingNode.bookKeeper = self.bookKeeper
+            action.existingNode.possibleActions = None
+            return action.existingNode
         return Node(
             structure=action.structure,
             cost=action.cost,
+            parentNode=self,
             parentConnector=action.connector,
             rewardFunction=self.rewardFunction,
             terminationFunction=self.terminationFunction,
@@ -210,15 +239,27 @@ class Node:
 
 class Action:
 
+    structure: Structure
+    cost: float
+    connector: Connector
+    existingNode: Node | None
+
     def __init__(
         self,
         structure: Structure = None,
         cost: float = 0.0,
         connector: Connector = None,
+        existingNode: Node = None,
     ):
-        self.structure = structure
-        self.cost = cost
         self.connector = connector
+        if existingNode:
+            self.structure = existingNode.structure
+            self.cost = 0
+            self.existingNode = existingNode
+        else:
+            self.structure = structure
+            self.cost = cost
+            self.existingNode = None
 
     def __add__(self, other):
         if isinstance(other, Action):

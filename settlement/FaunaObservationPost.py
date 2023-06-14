@@ -80,10 +80,7 @@ class FaunaObservationPost:
                 return -1
             return node.bookKeepingProperties['kitchenSize']
 
-        kitchenRootNode = settlementTools.findConnectionNode(
-            rewardFunction=kitchenRewardFunction,
-            nodeList=nodeList,
-        )
+        kitchenRootNode = settlementTools.findRandomConnectionNode(rng=rng, nodeList=nodeList)
         kitchenRootNode.bookKeeper = kitchenBookKeeping
         kitchenRootNode.rewardFunction = kitchenRewardFunction
         nodeList.extend(
@@ -103,10 +100,7 @@ class FaunaObservationPost:
                 return -1
             return node.bookKeepingProperties['foodSize']
 
-        foodSourceRootNode = settlementTools.findConnectionNode(
-            rewardFunction=foodSourceRewardFunction,
-            nodeList=nodeList,
-        )
+        foodSourceRootNode = settlementTools.findRandomConnectionNode(rng=rng, nodeList=nodeList)
         foodSourceRootNode.bookKeeper = foodBookKeeping
         foodSourceRootNode.rewardFunction = foodSourceRewardFunction
         nodeList.extend(
@@ -126,10 +120,7 @@ class FaunaObservationPost:
                 return -1
             return node.bookKeepingProperties['archiveSize']
 
-        archiveRootNode = settlementTools.findConnectionNode(
-            rewardFunction=archiveRewardFunction,
-            nodeList=nodeList,
-        )
+        archiveRootNode = settlementTools.findRandomConnectionNode(rng=rng, nodeList=nodeList)
         archiveRootNode.bookKeeper = archiveBookKeeping
         archiveRootNode.rewardFunction = archiveRewardFunction
         nodeList.extend(
