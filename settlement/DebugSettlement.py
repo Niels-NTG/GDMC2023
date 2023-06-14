@@ -39,22 +39,42 @@ class DebugSettlement:
             rng=rng,
             rewardFunction=rewardFunction1,
         )
-        settlementTools.runSearcher(rootNode1, rng, targets[0][1].id)
+        settlementTools.runSearcher(
+            rootNode=rootNode1,
+            rng=rng,
+            targetName=targets[0][1].id,
+            explorationConstant=settlementTools.explorationConstantWorldScale(),
+        )
 
         def rewardFunction2(node: Node) -> float:
             return float(np.sum(np.abs(targets[1][0] - node.structure.boxInWorldSpace.middle) * (1, 2, 1)))
         rootNode2 = settlementTools.findConnectionNodeGlobal(rewardFunction=rewardFunction2)
         rootNode2.rewardFunction = rewardFunction2
-        settlementTools.runSearcher(rootNode2, rng, targets[1][1].id)
+        settlementTools.runSearcher(
+            rootNode=rootNode2,
+            rng=rng,
+            targetName=targets[1][1].id,
+            explorationConstant=settlementTools.explorationConstantWorldScale(),
+        )
 
         def rewardFunction3(node: Node) -> float:
             return float(np.sum(np.abs(targets[2][0] - node.structure.boxInWorldSpace.middle) * (1, 2, 1)))
         rootNode3 = settlementTools.findConnectionNodeGlobal(rewardFunction=rewardFunction3)
         rootNode3.rewardFunction = rewardFunction3
-        settlementTools.runSearcher(rootNode3, rng, targets[2][1].id)
+        settlementTools.runSearcher(
+            rootNode=rootNode3,
+            rng=rng,
+            targetName=targets[2][1].id,
+            explorationConstant=settlementTools.explorationConstantWorldScale(),
+        )
 
         def rewardFunction4(node: Node) -> float:
             return float(np.sum(np.abs(targets[3][0] - node.structure.boxInWorldSpace.middle) * (1, 2, 1)))
         rootNode4 = settlementTools.findConnectionNodeGlobal(rewardFunction=rewardFunction4)
         rootNode4.rewardFunction = rewardFunction4
-        settlementTools.runSearcher(rootNode4, rng, targets[3][1].id)
+        settlementTools.runSearcher(
+            rootNode=rootNode4,
+            rng=rng,
+            targetName=targets[3][1].id,
+            explorationConstant=settlementTools.explorationConstantWorldScale(),
+        )
