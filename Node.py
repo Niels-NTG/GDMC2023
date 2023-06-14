@@ -24,6 +24,7 @@ class Node:
     bookKeepingProperties: dict[str, Any]
     bookKeeper: Callable[[Node], None] | None
     rng: np.random.Generator
+    parentNode: Node | None
     incomingConnector: Connector | None
     connectorSlots: set[Connector]
     routeNames: set[str]
@@ -57,6 +58,7 @@ class Node:
 
         self.rng = rng
 
+        self.parentNode = parentNode
         self.incomingConnector = None
         self.connectorSlots = set()
         if parentConnector:
@@ -81,8 +83,9 @@ class Node:
             self._bookKeeper = bookKeeper
             bookKeeper(self)
 
-    def finalize(self, nextNode: Node = None, routeName: str = None):
-        self.possibleActions = None
+    def finalize(self, nextNode: Node = None, routeName: str = None, clearActionCache: bool = False):
+        if clearActionCache:
+            self.possibleActions = None
         if nextNode:
             nextNode.incomingConnector.finalNode = nextNode
             self.connectorSlots.add(nextNode.incomingConnector)
@@ -194,11 +197,13 @@ class Node:
             action.existingNode.cost = action.cost
             action.existingNode.rewardFunction = self.rewardFunction
             action.existingNode.terminationFunction = self.terminationFunction
-            action.existingNode.actionFilter = self.actionFilter
+            # Only invalidate possibleActions cache if a different actionFilter is used
+            if action.existingNode.actionFilter != self.actionFilter:
+                action.existingNode.actionFilter = self.actionFilter
+                action.existingNode.possibleActions = None
             action.existingNode.settlementType = self.settlementType
             action.existingNode.bookKeepingProperties = deepcopy(self.bookKeepingProperties)
             action.existingNode.bookKeeper = self.bookKeeper
-            action.existingNode.possibleActions = None
             return action.existingNode
         return Node(
             structure=action.structure,

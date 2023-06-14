@@ -18,6 +18,7 @@ def runSearcher(
     targetName: str = '',
     iterationLimit: int = 40000,
     explorationConstant: float = 1 / np.sqrt(2),
+    clearActionCache: bool = False,
 ) -> list[Node]:
     print(f'Start MCTS for {targetName} (iterationLimit: {iterationLimit}, explorationConstant: {explorationConstant})')
     searcher = MCTS(
@@ -34,7 +35,7 @@ def runSearcher(
             continue
         nodeList.append(node)
     print(f'Finished running MCTS for {targetName}. A trace of {len(nodeList)} was found.')
-    finalizeTrace(nodeList, targetName)
+    finalizeTrace(nodeList, targetName, clearActionCache)
     return nodeList
 
 
@@ -62,12 +63,12 @@ def mctsRolloutPolicy(state: Node, rng: np.random.Generator = np.random.default_
     return state.getReward()
 
 
-def finalizeTrace(nodeList: list[Node], routeName: str = None):
+def finalizeTrace(nodeList: list[Node], routeName: str = None, clearActionCache: bool = False):
     for index, node in enumerate(nodeList):
         nextNode = None
         if index + 1 < len(nodeList):
             nextNode = nodeList[index + 1]
-        node.finalize(nextNode, routeName)
+        node.finalize(nextNode, routeName, clearActionCache)
 
 
 def findRandomConnectionNode(
