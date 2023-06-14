@@ -45,7 +45,7 @@ class FaunaObservationPost:
         personelRequirement = 4 + numberOfVillagers
         kitchenRequirement = personelRequirement
         foodRequirement = personelRequirement
-        archiveRequirement = max(1, numberOfVillagers // 10)
+        archiveRequirement = max(1, numberOfVillagers // 6)
         def bedsBookKeeping(node: Node):
             node.bookKeepingProperties['workerSize'] += node.structure.customProperties.get('workerCapacity', 0)
 
@@ -54,7 +54,7 @@ class FaunaObservationPost:
                 return -1
             return node.bookKeepingProperties['workerSize']
 
-        bedsRootNode = RootNode(
+        rootNode = RootNode(
             structure=MediumHub(
                 facing=rng.integers(4),
                 settlementType=settlementType,
@@ -69,12 +69,13 @@ class FaunaObservationPost:
         )
         nodeList.extend(
             settlementTools.runSearcher(
-                rootNode=bedsRootNode,
+                rootNode=rootNode,
                 rng=rng,
                 targetName=f'{settlementType}_beds',
                 explorationConstant=settlementTools.explorationConstantWorldScale(),
             )
         )
+        rootNode = nodeList[0]
 
         def kitchenBookKeeping(node: Node):
             node.bookKeepingProperties['kitchenSize'] += node.structure.customProperties.get('kitchenCapacity', 0)
@@ -84,13 +85,12 @@ class FaunaObservationPost:
                 return -1
             return node.bookKeepingProperties['kitchenSize']
 
-        kitchenRootNode = settlementTools.findRandomConnectionNode(rng=rng, nodeList=nodeList)
-        kitchenRootNode.bookKeeper = kitchenBookKeeping
-        kitchenRootNode.rewardFunction = kitchenRewardFunction
+        rootNode.bookKeeper = kitchenBookKeeping
+        rootNode.rewardFunction = kitchenRewardFunction
         irrelevantStructureTypes = ['medium_library', 'wide_library', 'wide_beds12', 'wide_greenhouse']
         nodeList.extend(
             settlementTools.runSearcher(
-                rootNode=kitchenRootNode,
+                rootNode=rootNode,
                 rng=rng,
                 targetName=f'{settlementType}_kitchens',
                 explorationConstant=settlementTools.explorationConstantWorldScale(),
@@ -105,13 +105,12 @@ class FaunaObservationPost:
                 return -1
             return node.bookKeepingProperties['foodSize']
 
-        foodSourceRootNode = settlementTools.findRandomConnectionNode(rng=rng, nodeList=nodeList)
-        foodSourceRootNode.bookKeeper = foodBookKeeping
-        foodSourceRootNode.rewardFunction = foodSourceRewardFunction
+        rootNode.bookKeeper = foodBookKeeping
+        rootNode.rewardFunction = foodSourceRewardFunction
         irrelevantStructureTypes = ['medium_library', 'wide_library', 'wide_beds12', 'wide_kitchen']
         nodeList.extend(
             settlementTools.runSearcher(
-                rootNode=foodSourceRootNode,
+                rootNode=rootNode,
                 rng=rng,
                 targetName=f'{settlementType}_food',
                 explorationConstant=settlementTools.explorationConstantWorldScale(),
@@ -126,13 +125,12 @@ class FaunaObservationPost:
                 return -1
             return node.bookKeepingProperties['archiveSize']
 
-        archiveRootNode = settlementTools.findRandomConnectionNode(rng=rng, nodeList=nodeList)
-        archiveRootNode.bookKeeper = archiveBookKeeping
-        archiveRootNode.rewardFunction = archiveRewardFunction
+        rootNode.bookKeeper = archiveBookKeeping
+        rootNode.rewardFunction = archiveRewardFunction
         irrelevantStructureTypes = ['wide_beds12', 'wide_kitchen', 'wide_greenhouse']
         nodeList.extend(
             settlementTools.runSearcher(
-                rootNode=archiveRootNode,
+                rootNode=rootNode,
                 rng=rng,
                 targetName=f'{settlementType}_archives',
                 explorationConstant=settlementTools.explorationConstantWorldScale(),
