@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import functools
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from StructureFolder import StructureFolder
@@ -26,6 +26,8 @@ class Structure:
 
     settlementType: str | None
 
+    customProperties: dict[str, Any]
+
     preProcessingSteps: list[worldTools.PlacementInstruction]
 
     _position: ivec3
@@ -44,6 +46,8 @@ class Structure:
         self.decorationStructureFiles = structureFolder.decorationStructureFiles
 
         self.settlementType = settlementType
+
+        self.customProperties = dict()
 
         self.preProcessingSteps = []
 
@@ -65,6 +69,10 @@ class Structure:
     @property
     def position2D(self) -> ivec2:
         return ivec2(self.position.x, self.position.z)
+
+    @property
+    def position2DCentered(self) -> ivec2:
+        return self.rectInWorldSpace.center
 
     @property
     def facing(self) -> int:
@@ -142,7 +150,7 @@ class Structure:
 
     def place(self):
         # noinspection PyTypeChecker
-        response = placeStructure(
+        placeStructure(
             self.structureFile.file,
             position=self.position, rotate=self.facing, mirror=None,
             pivot=self.structureFile.centerPivot
