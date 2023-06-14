@@ -34,7 +34,11 @@ class FaunaObservationPost:
             'archiveSize': 0,
         }
 
+        irrelevantStructureTypes = ['medium_library', 'wide_library', 'wide_kitchen', 'wide_greenhouse']
+
         def villageObservationPostActionFilter(candidateStructure: Structure) -> bool:
+            if candidateStructure.structureFile.name[:-4] in irrelevantStructureTypes:
+                return False
             return True
 
         numberOfVillagers = 22
@@ -83,6 +87,7 @@ class FaunaObservationPost:
         kitchenRootNode = settlementTools.findRandomConnectionNode(rng=rng, nodeList=nodeList)
         kitchenRootNode.bookKeeper = kitchenBookKeeping
         kitchenRootNode.rewardFunction = kitchenRewardFunction
+        irrelevantStructureTypes = ['medium_library', 'wide_library', 'wide_beds12', 'wide_greenhouse']
         nodeList.extend(
             settlementTools.runSearcher(
                 rootNode=kitchenRootNode,
@@ -103,6 +108,7 @@ class FaunaObservationPost:
         foodSourceRootNode = settlementTools.findRandomConnectionNode(rng=rng, nodeList=nodeList)
         foodSourceRootNode.bookKeeper = foodBookKeeping
         foodSourceRootNode.rewardFunction = foodSourceRewardFunction
+        irrelevantStructureTypes = ['medium_library', 'wide_library', 'wide_beds12', 'wide_kitchen']
         nodeList.extend(
             settlementTools.runSearcher(
                 rootNode=foodSourceRootNode,
@@ -123,6 +129,7 @@ class FaunaObservationPost:
         archiveRootNode = settlementTools.findRandomConnectionNode(rng=rng, nodeList=nodeList)
         archiveRootNode.bookKeeper = archiveBookKeeping
         archiveRootNode.rewardFunction = archiveRewardFunction
+        irrelevantStructureTypes = ['wide_beds12', 'wide_kitchen', 'wide_greenhouse']
         nodeList.extend(
             settlementTools.runSearcher(
                 rootNode=archiveRootNode,
