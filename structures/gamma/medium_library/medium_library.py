@@ -6,13 +6,13 @@ from glm import ivec3, ivec2
 import globals
 import vectorTools
 import worldTools
-from Connector import Connector
 from Node import Node
 from StructureBase import Structure
+from Connector import Connector
 from gdpc.gdpc.block import Block
 
 
-class WideLibrary(Structure):
+class MediumLibrary(Structure):
 
     def __init__(
         self,
@@ -26,10 +26,8 @@ class WideLibrary(Structure):
             facing=facing,
             settlementType=settlementType,
         )
-        self.southEastDoorStructure = self.transitionStructureFiles['south_east_door.nbt']
-        self.southWestDoorStructure = self.transitionStructureFiles['south_west_door.nbt']
 
-        self.customProperties['archiveCapacity'] = 4
+        self.customProperties['archiveCapacity'] = 1
 
     @property
     def connectors(self) -> list[Connector]:
@@ -39,25 +37,7 @@ class WideLibrary(Structure):
                 nextStructure=[
                     'narrow_exit',
                     'narrow_short_bridge',
-                ],
-            ),
-            Connector(
-                facing=1,
-                offset=ivec3(0, 0, 4),
-                nextStructure=[
-                    'narrow_exit',
-                    'narrow_short_bridge',
-                ],
-                transitionStructure=self.southWestDoorStructure,
-            ),
-            Connector(
-                facing=1,
-                offset=ivec3(0, 0, -4),
-                nextStructure=[
-                    'narrow_exit',
-                    'narrow_short_bridge',
-                ],
-                transitionStructure=self.southEastDoorStructure,
+                ]
             ),
             Connector(
                 facing=2,
@@ -65,24 +45,6 @@ class WideLibrary(Structure):
                     'narrow_exit',
                     'narrow_short_bridge',
                 ]
-            ),
-            Connector(
-                facing=3,
-                offset=ivec3(0, 0, 4),
-                nextStructure=[
-                    'narrow_exit',
-                    'narrow_short_bridge',
-                ],
-                transitionStructure=self.southWestDoorStructure,
-            ),
-            Connector(
-                facing=3,
-                offset=ivec3(0, 0, -4),
-                nextStructure=[
-                    'narrow_exit',
-                    'narrow_short_bridge',
-                ],
-                transitionStructure=self.southEastDoorStructure,
             )
         ]
 
@@ -100,22 +62,17 @@ class WideLibrary(Structure):
             return 0.0
         cost += pillarCost
 
-        # Libraries are expensive
-        cost += 10
-
         return cost
 
     def doPostProcessingSteps(self, node: Node = None):
         super().doPostProcessingSteps(node)
 
-        # TODO fill chest with random paper, books, maps
-
         # Place pillar
         pillarPositions: list[ivec2] = [
+            ivec2(3, 2),
             ivec2(3, 4),
-            ivec2(3, 10),
-            ivec2(11, 4),
-            ivec2(11, 10),
+            ivec2(11, 2),
+            ivec2(11, 4)
         ]
         for pillarPosition in pillarPositions:
             pillarPosition = vectorTools.rotatePointAroundOrigin2D(

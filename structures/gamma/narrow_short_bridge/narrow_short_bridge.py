@@ -31,6 +31,7 @@ class NarrowShortBridge(Structure):
                     facing=0,
                     nextStructure=[
                         'medium_hub',
+                        'medium_library',
                         'narrow_exit',
                         'narrow_hub',
                         'narrow_stairs_down_1',
@@ -47,6 +48,7 @@ class NarrowShortBridge(Structure):
                     facing=2,
                     nextStructure=[
                         'medium_hub',
+                        'medium_library',
                         'narrow_exit',
                         'narrow_hub',
                         'narrow_stairs_down_1',
