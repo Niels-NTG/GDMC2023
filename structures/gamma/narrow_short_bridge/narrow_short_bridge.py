@@ -25,6 +25,41 @@ class NarrowShortBridge(Structure):
 
     @property
     def connectors(self) -> list[Connector]:
+        if self.settlementType == 'villageObservationPost':
+            return [
+                Connector(
+                    facing=0,
+                    nextStructure=[
+                        'medium_hub',
+                        'narrow_exit',
+                        'narrow_hub',
+                        'narrow_stairs_down_1',
+                        'narrow_stairs_down_2',
+                        'narrow_stairs_up_1',
+                        'narrow_stairs_up_2',
+                        'wide_beds12',
+                        'wide_library',
+                        'wide_kitchen',
+                        'wide_greenhouse',
+                    ]
+                ),
+                Connector(
+                    facing=2,
+                    nextStructure=[
+                        'medium_hub',
+                        'narrow_exit',
+                        'narrow_hub',
+                        'narrow_stairs_down_1',
+                        'narrow_stairs_down_2',
+                        'narrow_stairs_up_1',
+                        'narrow_stairs_up_2',
+                        'wide_beds12',
+                        'wide_library',
+                        'wide_kitchen',
+                        'wide_greenhouse',
+                    ]
+                )
+            ]
         return [
             Connector(
                 facing=0,

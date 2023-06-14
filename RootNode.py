@@ -32,7 +32,7 @@ class RootNode(Node):
             return self.possibleActions
         possibleActions: list[Action] = []
 
-        sampleSize = int(worldTools.buildAreaSqrt() // 40)
+        sampleSize = max(1, int(worldTools.buildAreaSqrt() // 40))
         sampleLocations = self.rng.uniform(globals.buildarea.begin, globals.buildarea.end, (sampleSize, 2)).astype(int)
         for location in sampleLocations:
             # noinspection PyTypeChecker
@@ -68,3 +68,6 @@ class RootNode(Node):
 
         self.possibleActions = possibleActions
         return possibleActions
+
+    def getReward(self) -> float:
+        return 1.0

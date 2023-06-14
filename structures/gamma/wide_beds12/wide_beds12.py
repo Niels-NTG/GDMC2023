@@ -29,7 +29,7 @@ class WideBeds12(Structure):
         self.southEastDoorStructure = self.transitionStructureFiles['south_east_door.nbt']
         self.southWestDoorStructure = self.transitionStructureFiles['south_west_door.nbt']
 
-        self.customProperties['personelCapacity'] = 12
+        self.customProperties['workerCapacity'] = 12
 
     @property
     def connectors(self) -> list[Connector]:

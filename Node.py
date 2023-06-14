@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Callable
+from copy import deepcopy
+from typing import Callable, Any
 
 import numpy as np
 from glm import ivec3
@@ -20,11 +21,15 @@ class Node:
     terminationFunction: Callable[[Node], bool] | None
     actionFilter: Callable[[Structure], bool] | None
     settlementType: str | None
+    bookKeepingProperties: dict[str, Any]
+    bookKeeper: Callable[[Node], None] | None
     rng: np.random.Generator
     incomingConnector: Connector | None
     connectorSlots: set[Connector]
     routeNames: set[str]
     possibleActions: list[Action] | None
+
+    _bookKeeper: Callable[[Node], None] | None
 
     def __init__(
         self,
@@ -35,6 +40,8 @@ class Node:
         terminationFunction: Callable[[Node], bool] = None,
         actionFilter: Callable[[Structure], bool] = None,
         settlementType: str = None,
+        bookKeepingProperties: dict[str, Any] = None,
+        bookKeeper: Callable[[Node], None] = None,
         rng: np.random.Generator = np.random.default_rng(),
     ):
         self.structure = structure
@@ -43,6 +50,9 @@ class Node:
         self.terminationFunction = terminationFunction
         self.actionFilter = actionFilter
         self.settlementType = settlementType
+        self.bookKeepingProperties = deepcopy(bookKeepingProperties if bookKeepingProperties else dict())
+
+        self.bookKeeper = bookKeeper
 
         self.rng = rng
 
@@ -55,6 +65,18 @@ class Node:
         self.routeNames = set()
 
         self.possibleActions = None
+
+    @property
+    def bookKeeper(self):
+        return self._bookKeeper
+
+    @bookKeeper.setter
+    def bookKeeper(self, bookKeeper: Callable[[Node], None]):
+        if bookKeeper is None:
+            self._bookKeeper = None
+        else:
+            self._bookKeeper = bookKeeper
+            bookKeeper(self)
 
     def finalize(self, nextNode: Node = None, routeName: str = None):
         self.possibleActions = None
@@ -102,7 +124,7 @@ class Node:
 
     @staticmethod
     def getCurrentPlayer() -> int:
-        return -1
+        return 1
 
     def getPossibleActions(self) -> list[Action]:
         if self.possibleActions is not None:
@@ -158,13 +180,13 @@ class Node:
             terminationFunction=self.terminationFunction,
             actionFilter=self.actionFilter,
             settlementType=self.settlementType,
+            bookKeepingProperties=self.bookKeepingProperties,
+            bookKeeper=self.bookKeeper,
             rng=self.rng,
         )
 
     def isTerminal(self) -> bool:
         if self.terminationFunction and self.terminationFunction(self):
-            return True
-        if self.rewardFunction and self.rewardFunction(self) <= 0:
             return True
         if len(self.getPossibleActions()) == 0:
             return True
@@ -181,7 +203,9 @@ class Node:
         return hash(self) == hash(other)
 
     def __repr__(self):
-        return f'{__class__.__name__} {self.rewardFunction(self)} {self.structure} {self.routeNames}'
+        return f'{__class__.__name__}; ' \
+               f'{self.structure}; ' \
+               f'{self.bookKeepingProperties}; {self.rewardFunction(self)}; {self.routeNames}'
 
 
 class Action:

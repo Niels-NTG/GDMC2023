@@ -18,6 +18,7 @@ def runSearcher(
     iterationLimit: int = 40000,
     explorationConstant: float = 1 / np.sqrt(2),
 ) -> list[Node]:
+    print(f'Start MCTS for {targetName} (iterationLimit: {iterationLimit}, explorationConstant: {explorationConstant})')
     searcher = MCTS(
         iterationLimit=iterationLimit,
         rolloutPolicy=mctsRolloutPolicy,
@@ -26,6 +27,7 @@ def runSearcher(
     )
     searcher.search(initialState=rootNode)
     nodeList: list[Node] = searcher.getBestRoute()
+    print(f'Finished running MCTS for {targetName}. A trace of {len(nodeList)} was found.')
     finalizeTrace(nodeList, targetName)
     return nodeList
 

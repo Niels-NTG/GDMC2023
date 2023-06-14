@@ -175,4 +175,4 @@ class Structure:
         return hash((self.structureFile, self.position, self.facing))
 
     def __repr__(self):
-        return f'{self.structureFile} - position: {self.position}; facing: {self.facing}'
+        return f'{self.structureFile}; pos: {self.position.x},{self.position.y},{self.position.z}; f: {self.facing}'
