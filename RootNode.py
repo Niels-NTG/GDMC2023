@@ -20,6 +20,9 @@ class RootNode(Node):
     def place(self):
         pass
 
+    def doPostProcessingSteps(self):
+        pass
+
     @property
     def hasOpenSlot(self) -> bool:
         return False
