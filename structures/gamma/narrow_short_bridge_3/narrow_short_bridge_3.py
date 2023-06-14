@@ -94,6 +94,6 @@ class NarrowShortBridge3(Structure):
     def evaluateStructure(self) -> float:
         cost = super().evaluateStructure()
 
-        cost += 2
+        cost += 6
 
         return cost
