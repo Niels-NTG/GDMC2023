@@ -107,3 +107,21 @@ def loop2DwithRects(
             )
             newRect.end = glm.min(newRect.end, end)
             yield newRect
+
+
+def mergeRects(
+    rectList: list[Rect],
+) -> Rect:
+    if len(rectList) == 1:
+        return rectList[0]
+    rectStarts: list[ivec2] = []
+    rectEnds: list[ivec2] = []
+    for rect in rectList:
+        rectStarts.append(rect.begin)
+        rectEnds.append(rect.end)
+    # noinspection PyTypeChecker
+    rect = Rect(
+        offset=glm.min(rectStarts),
+    )
+    rect.end = glm.max(rectEnds)
+    return rect
