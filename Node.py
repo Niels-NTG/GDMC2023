@@ -18,6 +18,7 @@ class Node:
     cost: float
     rewardFunction: Callable[[Node], float] | None
     terminationFunction: Callable[[Node], bool] | None
+    actionFilter: Callable[[Structure], bool] | None
     settlementType: str | None
     rng: np.random.Generator
     incomingConnector: Connector | None
@@ -32,6 +33,7 @@ class Node:
         parentConnector: Connector | None = None,
         rewardFunction: Callable[[Node], float] = None,
         terminationFunction: Callable[[Node], bool] = None,
+        actionFilter: Callable[[Structure], bool] = None,
         settlementType: str = None,
         rng: np.random.Generator = np.random.default_rng(),
     ):
@@ -39,6 +41,7 @@ class Node:
         self.cost = cost
         self.rewardFunction = rewardFunction
         self.terminationFunction = terminationFunction
+        self.actionFilter = actionFilter
         self.settlementType = settlementType
 
         self.rng = rng
@@ -152,6 +155,8 @@ class Node:
             cost=action.cost,
             parentConnector=action.connector,
             rewardFunction=self.rewardFunction,
+            terminationFunction=self.terminationFunction,
+            actionFilter=self.actionFilter,
             settlementType=self.settlementType,
             rng=self.rng,
         )
@@ -176,7 +181,7 @@ class Node:
         return hash(self) == hash(other)
 
     def __repr__(self):
-        return f'{__class__.__name__} {self.routeNames} {self.rewardFunction(self)} {self.structure}'
+        return f'{__class__.__name__} {self.rewardFunction(self)} {self.structure} {self.routeNames}'
 
 
 class Action:
