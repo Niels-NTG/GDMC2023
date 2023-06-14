@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import numpy as np
 from glm import ivec3, ivec2
 
 import globals
@@ -12,12 +11,25 @@ import vectorTools
 
 class RootNode(Node):
 
+    def finalize(self, nextNode: Node = None, routeName: str = None):
+        pass
+
+    def doPreProcessingSteps(self):
+        pass
+
+    def place(self):
+        pass
+
+    @property
+    def hasOpenSlot(self) -> bool:
+        return False
+
     def getPossibleActions(self) -> list[Action]:
         if self.possibleActions is not None:
             return self.possibleActions
         possibleActions: list[Action] = []
 
-        sampleSize = min(4, int(worldTools.buildAreaSqrt() // 20))
+        sampleSize = int(worldTools.buildAreaSqrt() // 40)
         sampleLocations = self.rng.uniform(globals.buildarea.begin, globals.buildarea.end, (sampleSize, 2)).astype(int)
         for location in sampleLocations:
             # noinspection PyTypeChecker
@@ -34,9 +46,15 @@ class RootNode(Node):
             if locationEvaluation[0] > 10:
                 continue
 
+            structurePosition = ivec3(location[0], locationEvaluation[2] + 1, location[1])
+            structureRotation = self.rng.integers(4)
+            self.structure.position = structurePosition
+            self.structure.facing = structureRotation
+            # noinspection PyArgumentList
             candidateStructure = type(self.structure)(
-                position=ivec3(location[0], locationEvaluation[2] + 1, location[1]),
-                facing=self.rng.integers(4),
+                position=structurePosition,
+                facing=structureRotation,
+                settlementType=self.settlementType,
             )
             structureEvaluation = self.evaluateCandidateNextStructure(candidateStructure)
             if structureEvaluation > 0:
