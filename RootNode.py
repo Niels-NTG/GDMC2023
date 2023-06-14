@@ -69,5 +69,21 @@ class RootNode(Node):
         self.possibleActions = possibleActions
         return possibleActions
 
+    def takeAction(self, action: Action) -> Node:
+        return Node(
+            structure=action.structure,
+            cost=action.cost,
+            # Omitted: RootNode does not count as parent
+            # parentNode=self,
+            # parentConnector=action.connector,
+            rewardFunction=self.rewardFunction,
+            terminationFunction=self.terminationFunction,
+            actionFilter=self.actionFilter,
+            settlementType=self.settlementType,
+            bookKeepingProperties=self.bookKeepingProperties,
+            bookKeeper=self.bookKeeper,
+            rng=self.rng,
+        )
+
     def getReward(self) -> float:
         return 1.0

@@ -9,6 +9,7 @@ import numpy as np
 import globals
 import worldTools
 from MCTS.mcts import MCTS
+from RootNode import RootNode
 
 
 def runSearcher(
@@ -26,7 +27,12 @@ def runSearcher(
         rng=rng,
     )
     searcher.search(initialState=rootNode)
-    nodeList: list[Node] = searcher.getBestRoute()
+    bestNodes: list[Node] = searcher.getBestRoute()
+    nodeList: list[Node] = []
+    for node in bestNodes:
+        if isinstance(node, RootNode):
+            continue
+        nodeList.append(node)
     print(f'Finished running MCTS for {targetName}. A trace of {len(nodeList)} was found.')
     finalizeTrace(nodeList, targetName)
     return nodeList
