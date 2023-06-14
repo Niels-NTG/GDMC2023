@@ -8,7 +8,7 @@ from StructureBase import Structure
 from Connector import Connector
 
 
-class NarrowShortBridge(Structure):
+class NarrowShortBridge1(Structure):
 
     def __init__(
         self,

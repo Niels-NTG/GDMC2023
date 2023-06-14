@@ -36,7 +36,9 @@ class WideHub(Structure):
                 facing=0,
                 nextStructure=[
                     'narrow_exit',
-                    'narrow_short_bridge',
+                    'narrow_short_bridge_1',
+                    'narrow_short_bridge_2',
+                    'narrow_short_bridge_3',
                 ],
             ),
             Connector(
@@ -44,7 +46,9 @@ class WideHub(Structure):
                 offset=ivec3(0, 0, 4),
                 nextStructure=[
                     'narrow_exit',
-                    'narrow_short_bridge',
+                    'narrow_short_bridge_1',
+                    'narrow_short_bridge_2',
+                    'narrow_short_bridge_3',
                 ],
                 transitionStructure=self.southWestDoorStructure,
             ),
@@ -53,7 +57,9 @@ class WideHub(Structure):
                 offset=ivec3(0, 0, -4),
                 nextStructure=[
                     'narrow_exit',
-                    'narrow_short_bridge',
+                    'narrow_short_bridge_1',
+                    'narrow_short_bridge_2',
+                    'narrow_short_bridge_3',
                 ],
                 transitionStructure=self.southEastDoorStructure,
             ),
@@ -61,7 +67,9 @@ class WideHub(Structure):
                 facing=2,
                 nextStructure=[
                     'narrow_exit',
-                    'narrow_short_bridge',
+                    'narrow_short_bridge_1',
+                    'narrow_short_bridge_2',
+                    'narrow_short_bridge_3',
                 ]
             ),
             Connector(
@@ -69,7 +77,9 @@ class WideHub(Structure):
                 offset=ivec3(0, 0, 4),
                 nextStructure=[
                     'narrow_exit',
-                    'narrow_short_bridge',
+                    'narrow_short_bridge_1',
+                    'narrow_short_bridge_2',
+                    'narrow_short_bridge_3',
                 ],
                 transitionStructure=self.southWestDoorStructure,
             ),
@@ -78,7 +88,9 @@ class WideHub(Structure):
                 offset=ivec3(0, 0, -4),
                 nextStructure=[
                     'narrow_exit',
-                    'narrow_short_bridge',
+                    'narrow_short_bridge_1',
+                    'narrow_short_bridge_2',
+                    'narrow_short_bridge_3',
                 ],
                 transitionStructure=self.southEastDoorStructure,
             )

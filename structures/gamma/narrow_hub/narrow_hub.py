@@ -33,7 +33,9 @@ class NarrowHub(Structure):
                 facing=0,
                 nextStructure=[
                     'narrow_exit',
-                    'narrow_short_bridge',
+                    'narrow_short_bridge_1',
+                    'narrow_short_bridge_2',
+                    'narrow_short_bridge_3',
                 ],
                 transitionStructure=self.transitionStructureFiles['door_east.nbt'],
             ),
@@ -41,7 +43,9 @@ class NarrowHub(Structure):
                 facing=1,
                 nextStructure=[
                     'narrow_exit',
-                    'narrow_short_bridge',
+                    'narrow_short_bridge_1',
+                    'narrow_short_bridge_2',
+                    'narrow_short_bridge_3',
                 ],
                 transitionStructure=self.transitionStructureFiles['door_south.nbt'],
             ),
@@ -49,7 +53,9 @@ class NarrowHub(Structure):
                 facing=2,
                 nextStructure=[
                     'narrow_exit',
-                    'narrow_short_bridge',
+                    'narrow_short_bridge_1',
+                    'narrow_short_bridge_2',
+                    'narrow_short_bridge_3',
                 ],
                 transitionStructure=self.transitionStructureFiles['door_east.nbt'],
             ),
@@ -57,7 +63,9 @@ class NarrowHub(Structure):
                 facing=3,
                 nextStructure=[
                     'narrow_exit',
-                    'narrow_short_bridge',
+                    'narrow_short_bridge_1',
+                    'narrow_short_bridge_2',
+                    'narrow_short_bridge_3',
                 ],
                 transitionStructure=self.transitionStructureFiles['door_south.nbt'],
             )

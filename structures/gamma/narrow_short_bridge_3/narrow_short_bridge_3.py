@@ -8,7 +8,7 @@ from StructureBase import Structure
 from Connector import Connector
 
 
-class NarrowShortBridge(Structure):
+class NarrowShortBridge3(Structure):
 
     def __init__(
         self,
@@ -90,3 +90,10 @@ class NarrowShortBridge(Structure):
                 ]
             )
         ]
+
+    def evaluateStructure(self) -> float:
+        cost = super().evaluateStructure()
+
+        cost += 2
+
+        return cost
