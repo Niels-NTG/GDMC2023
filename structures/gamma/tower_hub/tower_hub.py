@@ -77,9 +77,9 @@ class TowerHub(Structure):
                 heightmapType='OCEAN_FLOOR_NO_PLANTS'
             )
         ) * 5) ** 2.0
-        if pillarCost < 0:
+        if pillarCost <= 0:
             # If pillar cost is negative, do not built underground
-            return 0.0
+            pillarCost = 6
         score += pillarCost
 
         return score
