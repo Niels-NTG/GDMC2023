@@ -28,7 +28,8 @@ class Node:
     incomingConnector: Connector | None
     connectorSlots: set[Connector]
     routeNames: set[str]
-    possibleActions: list[Action] | None
+    possibleActions: set[Action]
+    hasPossibleActionsCache: bool
 
     _bookKeeper: Callable[[Node], None] | None
 
@@ -69,7 +70,8 @@ class Node:
 
         self.routeNames = set()
 
-        self.possibleActions = None
+        self.possibleActions = set()
+        self.hasPossibleActionsCache = False
 
     @property
     def bookKeeper(self):
@@ -85,9 +87,10 @@ class Node:
 
     def finalize(self, nextNode: Node = None, routeName: str = None, clearActionCache: bool = False):
         if clearActionCache:
-            self.possibleActions = None
-        elif self.possibleActions is not None and nextNode:
-            for possibleAction in self.possibleActions:
+            self.possibleActions.clear()
+            self.hasPossibleActionsCache = False
+        elif self.hasPossibleActionsCache and nextNode:
+            for possibleAction in self.possibleActions.copy():
                 if possibleAction.connector == nextNode.incomingConnector:
                     self.possibleActions.remove(possibleAction)
         if nextNode:
@@ -138,28 +141,28 @@ class Node:
         return 1
 
     def getPossibleActions(self) -> list[Action]:
-        if self.possibleActions is not None:
-            return self.possibleActions
-        possibleActions: list[Action] = []
-
         for connector in self.structure.connectors:
-
             # Check if slot isn't already occupied by other node
             if connector in self.connectorSlots:
-                # Skip the rear-facing connector to prevent searching through parent nodes
-                if self.parentNode and connector == self.structure.rearFacingConnector:
-                    continue
                 # Use existing node instead of creating a new one
-                matchingConnector: Connector | None = None
+                matchingConnector = None
                 for connectorSlot in self.connectorSlots:
                     if connectorSlot == connector:
                         matchingConnector = connectorSlot
                         break
+
                 if matchingConnector.finalNode and matchingConnector.finalNode != self.parentNode:
-                    possibleActions.append(Action(
+                    self.possibleActions.add(Action(
                         existingNode=matchingConnector.finalNode,
                         connector=matchingConnector,
                     ))
+                continue
+        if self.hasPossibleActionsCache:
+            return list(self.possibleActions)
+        for connector in self.structure.connectors:
+
+            # Check if slot isn't already occupied by other node
+            if connector in self.connectorSlots:
                 continue
 
             connectionRotation: int = (connector.facing + self.structure.facing) % 4
@@ -187,14 +190,13 @@ class Node:
 
                 candidateStructureCost = self.evaluateCandidateNextStructure(candidateStructure)
                 if candidateStructureCost > 0:
-                    possibleActions.append(Action(
+                    self.possibleActions.add(Action(
                         structure=candidateStructure,
                         cost=candidateStructureCost,
                         connector=connector,
                     ))
-
-        self.possibleActions = possibleActions
-        return possibleActions
+        self.hasPossibleActionsCache = True
+        return list(self.possibleActions)
 
     def takeAction(self, action: Action) -> Node:
         if action.existingNode:
@@ -268,6 +270,10 @@ class Action:
             self.cost = cost
             self.existingNode = None
 
+    @property
+    def structureFileName(self):
+        return self.structure.structureFile.name[:-4]
+
     def __add__(self, other):
         if isinstance(other, Action):
             return self.cost + other.cost
@@ -280,7 +286,7 @@ class Action:
         return hash(self) == hash(other)
 
     def __hash__(self):
-        return hash((self.structure, self.cost))
+        return hash((self.connector, self.structureFileName))
 
     def __repr__(self):
         return f'{__class__.__name__} {self.cost} {self.structure}'

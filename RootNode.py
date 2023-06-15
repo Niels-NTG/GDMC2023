@@ -28,10 +28,8 @@ class RootNode(Node):
         return False
 
     def getPossibleActions(self) -> list[Action]:
-        if self.possibleActions is not None:
-            return self.possibleActions
-        possibleActions: list[Action] = []
-
+        if self.hasPossibleActionsCache:
+            return list(self.possibleActions)
         sampleSize = max(2, int(worldTools.buildAreaSqrt() // 40))
         sampleLocations = self.rng.uniform(globals.buildarea.begin, globals.buildarea.end, (sampleSize, 2)).astype(int)
         for location in sampleLocations:
@@ -61,13 +59,12 @@ class RootNode(Node):
             )
             structureEvaluation = self.evaluateCandidateNextStructure(candidateStructure)
             if structureEvaluation > 0:
-                possibleActions.append(Action(
+                self.possibleActions.add(Action(
                     structure=candidateStructure,
                     cost=locationEvaluation[0] + structureEvaluation,
                 ))
-
-        self.possibleActions = possibleActions
-        return self.possibleActions
+        self.hasPossibleActionsCache = True
+        return list(self.possibleActions)
 
     def takeAction(self, action: Action) -> Node:
         return Node(
