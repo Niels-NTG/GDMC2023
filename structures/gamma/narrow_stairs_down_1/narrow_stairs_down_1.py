@@ -68,6 +68,9 @@ class NarrowStairsDown1(Structure):
             # If pillar cost is negative, do not built underground
             pillarCost = 4
         cost += pillarCost
+
+        cost += 10
+
         return cost
 
     def doPostProcessingSteps(self, node: Node = None):
