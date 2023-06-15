@@ -11,7 +11,7 @@ import vectorTools
 
 class RootNode(Node):
 
-    def finalize(self, nextNode: Node = None, routeName: str = None):
+    def finalize(self, nextNode: Node = None, routeName: str = None, clearActionCache: bool = False):
         pass
 
     def doPreProcessingSteps(self):
@@ -32,7 +32,7 @@ class RootNode(Node):
             return self.possibleActions
         possibleActions: list[Action] = []
 
-        sampleSize = max(1, int(worldTools.buildAreaSqrt() // 40))
+        sampleSize = max(2, int(worldTools.buildAreaSqrt() // 40))
         sampleLocations = self.rng.uniform(globals.buildarea.begin, globals.buildarea.end, (sampleSize, 2)).astype(int)
         for location in sampleLocations:
             # noinspection PyTypeChecker
@@ -67,7 +67,7 @@ class RootNode(Node):
                 ))
 
         self.possibleActions = possibleActions
-        return possibleActions
+        return self.possibleActions
 
     def takeAction(self, action: Action) -> Node:
         return Node(

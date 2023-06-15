@@ -27,6 +27,7 @@ class FaunaObservationPost:
 
         nodeList: list[Node] = []
 
+        explorationContant = 4.0
         initialSettlementProperties = {
             'workerSize': 0,
             'kitchenSize': 0,
@@ -34,21 +35,21 @@ class FaunaObservationPost:
             'archiveSize': 0,
         }
 
-        irrelevantStructureTypes = ['medium_library', 'wide_library', 'wide_kitchen', 'wide_greenhouse']
-
-        def villageObservationPostActionFilter(candidateStructure: Structure) -> bool:
-            if candidateStructure.structureFile.name[:-4] in irrelevantStructureTypes:
-                return False
-            return True
-
         numberOfVillagers = 22
         personelRequirement = 4 + numberOfVillagers
         kitchenRequirement = personelRequirement
         foodRequirement = personelRequirement
         archiveRequirement = max(1, numberOfVillagers // 6)
-        def bedsBookKeeping(node: Node):
-            node.bookKeepingProperties['workerSize'] += node.structure.customProperties.get('workerCapacity', 0)
+        storageRequirement = max(2, personelRequirement // 4)
 
+        def multiObjectiveBookKeeper(node: Node):
+            node.bookKeepingProperties['workerSize'] += node.structure.customProperties.get('workerCapacity', 0)
+            node.bookKeepingProperties['kitchenSize'] += node.structure.customProperties.get('kitchenCapacity', 0)
+            node.bookKeepingProperties['foodSize'] += node.structure.customProperties.get('foodUnits', 0)
+            node.bookKeepingProperties['archiveSize'] += node.structure.customProperties.get('archiveCapacity', 0)
+
+        def villageObservationPostActionFilter(candidateStructure: Structure) -> bool:
+            return True
         def bedsRewardFunction(node: Node) -> float:
             if node.bookKeepingProperties['workerSize'] > personelRequirement:
                 return -1
@@ -65,77 +66,58 @@ class FaunaObservationPost:
             rewardFunction=bedsRewardFunction,
             settlementType=settlementType,
             bookKeepingProperties=initialSettlementProperties,
-            bookKeeper=bedsBookKeeping,
+            bookKeeper=multiObjectiveBookKeeper,
         )
-        nodeList.extend(
-            settlementTools.runSearcher(
-                rootNode=rootNode,
-                rng=rng,
-                targetName=f'{settlementType}_beds',
-                explorationConstant=settlementTools.explorationConstantWorldScale(),
-            )
+        nodeListPart = settlementTools.runSearcher(
+            rootNode=rootNode,
+            rng=rng,
+            targetName=f'{settlementType}_beds',
+            explorationConstant=explorationContant,
         )
+        nodeList.extend(nodeListPart)
         rootNode = nodeList[0]
-
-        def kitchenBookKeeping(node: Node):
-            node.bookKeepingProperties['kitchenSize'] += node.structure.customProperties.get('kitchenCapacity', 0)
 
         def kitchenRewardFunction(node: Node) -> float:
             if node.bookKeepingProperties['kitchenSize'] > kitchenRequirement:
                 return -1
             return node.bookKeepingProperties['kitchenSize']
 
-        rootNode.bookKeeper = kitchenBookKeeping
         rootNode.rewardFunction = kitchenRewardFunction
-        irrelevantStructureTypes = ['medium_library', 'wide_library', 'wide_beds12', 'wide_greenhouse']
-        nodeList.extend(
-            settlementTools.runSearcher(
-                rootNode=rootNode,
-                rng=rng,
-                targetName=f'{settlementType}_kitchens',
-                explorationConstant=settlementTools.explorationConstantWorldScale(),
-            )
+        nodeListPart = settlementTools.runSearcher(
+            rootNode=rootNode,
+            rng=rng,
+            targetName=f'{settlementType}_kitchens',
+            explorationConstant=explorationContant,
         )
-
-        def foodBookKeeping(node: Node):
-            node.bookKeepingProperties['foodSize'] += node.structure.customProperties.get('foodUnits', 0)
+        nodeList.extend(nodeListPart)
 
         def foodSourceRewardFunction(node: Node) -> float:
             if node.bookKeepingProperties['foodSize'] > foodRequirement:
                 return -1
             return node.bookKeepingProperties['foodSize']
 
-        rootNode.bookKeeper = foodBookKeeping
         rootNode.rewardFunction = foodSourceRewardFunction
-        irrelevantStructureTypes = ['medium_library', 'wide_library', 'wide_beds12', 'wide_kitchen']
-        nodeList.extend(
-            settlementTools.runSearcher(
-                rootNode=rootNode,
-                rng=rng,
-                targetName=f'{settlementType}_food',
-                explorationConstant=settlementTools.explorationConstantWorldScale(),
-            )
+        nodeListPart = settlementTools.runSearcher(
+            rootNode=rootNode,
+            rng=rng,
+            targetName=f'{settlementType}_food',
+            explorationConstant=explorationContant,
         )
-
-        def archiveBookKeeping(node: Node):
-            node.bookKeepingProperties['archiveSize'] += node.structure.customProperties.get('archiveCapacity', 0)
+        nodeList.extend(nodeListPart)
 
         def archiveRewardFunction(node: Node) -> float:
             if node.bookKeepingProperties['archiveSize'] > archiveRequirement:
                 return -1
             return node.bookKeepingProperties['archiveSize']
 
-        rootNode.bookKeeper = archiveBookKeeping
         rootNode.rewardFunction = archiveRewardFunction
-        irrelevantStructureTypes = ['wide_beds12', 'wide_kitchen', 'wide_greenhouse']
-        nodeList.extend(
-            settlementTools.runSearcher(
-                rootNode=rootNode,
-                rng=rng,
-                targetName=f'{settlementType}_archives',
-                explorationConstant=settlementTools.explorationConstantWorldScale(),
-            )
+        nodeListPart = settlementTools.runSearcher(
+            rootNode=rootNode,
+            rng=rng,
+            targetName=f'{settlementType}_archive',
+            explorationConstant=explorationContant,
         )
+        nodeList.extend(nodeListPart)
 
     @staticmethod
     def findDrowned() -> list[worldTools.EntitiesPerArea]:

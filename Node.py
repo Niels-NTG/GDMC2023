@@ -86,6 +86,10 @@ class Node:
     def finalize(self, nextNode: Node = None, routeName: str = None, clearActionCache: bool = False):
         if clearActionCache:
             self.possibleActions = None
+        elif self.possibleActions is not None and nextNode:
+            for possibleAction in self.possibleActions:
+                if possibleAction.connector == nextNode.incomingConnector:
+                    self.possibleActions.remove(possibleAction)
         if nextNode:
             nextNode.incomingConnector.finalNode = nextNode
             self.connectorSlots.add(nextNode.incomingConnector)
@@ -143,7 +147,7 @@ class Node:
             # Check if slot isn't already occupied by other node
             if connector in self.connectorSlots:
                 # Skip the rear-facing connector to prevent searching through parent nodes
-                if connector == self.structure.rearFacingConnector:
+                if self.parentNode and connector == self.structure.rearFacingConnector:
                     continue
                 # Use existing node instead of creating a new one
                 matchingConnector: Connector | None = None
@@ -151,7 +155,7 @@ class Node:
                     if connectorSlot == connector:
                         matchingConnector = connectorSlot
                         break
-                if matchingConnector and matchingConnector.finalNode:
+                if matchingConnector.finalNode and matchingConnector.finalNode != self.parentNode:
                     possibleActions.append(Action(
                         existingNode=matchingConnector.finalNode,
                         connector=matchingConnector,
@@ -202,8 +206,6 @@ class Node:
                 action.existingNode.actionFilter = self.actionFilter
                 action.existingNode.possibleActions = None
             action.existingNode.settlementType = self.settlementType
-            action.existingNode.bookKeepingProperties = deepcopy(self.bookKeepingProperties)
-            action.existingNode.bookKeeper = self.bookKeeper
             return action.existingNode
         return Node(
             structure=action.structure,
