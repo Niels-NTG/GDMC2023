@@ -101,7 +101,7 @@ class Node:
         globals.nodeList.add(self)
 
     def doPreProcessingSteps(self):
-        self.structure.doPreProcessingSteps()
+        self.structure.doPreProcessingSteps(self)
 
     def place(self):
         self.structure.place()

@@ -3,18 +3,24 @@ from __future__ import annotations
 import functools
 from typing import TYPE_CHECKING, Any
 
+import vectorTools
+
 if TYPE_CHECKING:
     from StructureFolder import StructureFolder
     from StructureFile import StructureFile
     from Node import Node
 
 from glm import ivec3, ivec2
+import numpy as np
 
 import globals
 import worldTools
 from Connector import Connector
+import nbtTools
 from gdpc.gdpc.interface import placeStructure
-from gdpc.gdpc.vector_tools import Box, Rect
+from gdpc.gdpc.vector_tools import Box, Rect, loop3D
+from gdpc.gdpc.lookup import INVENTORY_BLOCKS, CONTAINER_BLOCK_TO_INVENTORY_SIZE
+from gdpc.gdpc.block_state_tools import rotateFacing
 
 
 class Structure:
@@ -133,6 +139,46 @@ class Structure:
                 return connector
         return Connector(facing=2)
 
+    def setInventoryBlocks(
+        self,
+        rng: np.random.Generator = np.random.default_rng()
+    ) -> list[worldTools.PlacementInstruction]:
+        newInventoryBlockPlacements: list[worldTools.PlacementInstruction] = []
+        for pos in loop3D(self.box.size):
+            block = nbtTools.getBlockAt(self.structureFile.nbt, pos)
+            if block is None:
+                continue
+            if block.id not in INVENTORY_BLOCKS:
+                continue
+            inventoryDimensions: ivec2 = CONTAINER_BLOCK_TO_INVENTORY_SIZE[block.id]
+            newInventory = []
+            for inventorySlots in range(inventoryDimensions.x * inventoryDimensions.y):
+                if rng.random() < 0.5:
+                    continue
+
+                # TODO generate item from table
+                material = 'paper'
+
+                newInventory.append({
+                    'x': rng.integers(inventoryDimensions.x),
+                    'y': rng.integers(inventoryDimensions.y),
+                    'material': material,
+                    'amount': rng.integers(1, 6)
+                })
+            block = nbtTools.setInventoryContents(block, newInventory)
+            transformedPosition = vectorTools.rotatePointAroundOrigin3D(
+                origin=self.boxInWorldSpace.middle,
+                point=pos + self.boxInWorldSpace.offset,
+                rotation=self.facing,
+            )
+            if block.states.get('facing'):
+                block.states['facing'] = rotateFacing(block.states.get('facing'), self.facing)
+            newInventoryBlockPlacements.append(worldTools.PlacementInstruction(
+                position=transformedPosition,
+                block=block,
+            ))
+        return newInventoryBlockPlacements
+
     def evaluateStructure(self) -> float:
         cost = 1.0
 
@@ -140,8 +186,9 @@ class Structure:
 
         return cost
 
-    def doPreProcessingSteps(self):
+    def doPreProcessingSteps(self, node: Node = None):
         self.preProcessingSteps.extend(worldTools.getTreeCuttingInstructions(self.rectInWorldSpace))
+
         for preProcessingStep in self.preProcessingSteps:
             globals.editor.placeBlockGlobal(
                 position=preProcessingStep.position,
@@ -166,6 +213,13 @@ class Structure:
                 connector.transitionStructure.file,
                 position=self.position, rotate=(connector.facing + self.facing) % 4, mirror=None,
                 pivot=connector.transitionStructure.centerPivot,
+            )
+        postProcessingSteps: list[worldTools.PlacementInstruction] = []
+        postProcessingSteps.extend(self.setInventoryBlocks(node.rng))
+        for postProcessingStep in postProcessingSteps:
+            globals.editor.placeBlockGlobal(
+                position=postProcessingStep.position,
+                block=postProcessingStep.block,
             )
 
     def __eq__(self, other):
