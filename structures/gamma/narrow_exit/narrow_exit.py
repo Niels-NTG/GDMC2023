@@ -26,6 +26,7 @@ class NarrowExit(Structure):
             facing=facing,
             settlementType=settlementType,
         )
+        self.customProperties['exit'] = 1
 
     @property
     def connectors(self) -> list[Connector]:

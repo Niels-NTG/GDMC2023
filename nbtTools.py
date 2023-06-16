@@ -54,7 +54,7 @@ def setInventoryContents(inventoryBlock: Block, contents: list[dict]) -> Block:
             min(item['y'], inventoryDimensions.y - 1),
             min(item['x'], inventoryDimensions.x - 1)
         ]
-        newChestContents += f'{{Slot: {slotIndex}b, Count: {item.get("amount")}b, id: "{item.get("material")}"}},'
+        newChestContents += f'{{Slot: {slotIndex}b, Count: {item.get("amount")}b, id: "{item.get("material")}", tag: {item.get("tag")}}},'
 
     newChestContents = newChestContents[:-1]
     newChestContents += ']}'

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import string
 from typing import TYPE_CHECKING, Any
 
 import vectorTools
@@ -21,6 +22,7 @@ from gdpc.gdpc.interface import placeStructure
 from gdpc.gdpc.vector_tools import Box, Rect, loop3D
 from gdpc.gdpc.lookup import INVENTORY_BLOCKS, CONTAINER_BLOCK_TO_INVENTORY_SIZE
 from gdpc.gdpc.block_state_tools import rotateFacing
+from gdpc.gdpc.minecraft_tools import bookData
 
 
 class Structure:
@@ -164,12 +166,52 @@ class Structure:
                 if rng.random() > itemRarity:
                     continue
 
-                newInventory.append({
+                newItemDict = {
                     'x': rng.integers(inventoryDimensions.x),
                     'y': rng.integers(inventoryDimensions.y),
                     'material': itemType,
-                    'amount': rng.integers(1, itemMaxQuantity + 1)
-                })
+                    'amount': rng.integers(1, itemMaxQuantity + 1),
+                }
+                if itemType == 'written_book':
+                    randomCodes = ''.join(rng.choice(list(string.hexdigits), size=10))
+                    randomCodesSampleName = ''.join(rng.choice(list(string.hexdigits), size=8))
+                    author = 'The members of the {} research team'.format(rng.choice([
+                        'exogeology',
+                        'exobiology',
+                        'exobiotanica',
+                        'exo-ecology',
+                        'exo-seismology',
+                        'exo-planetary',
+                        'exo macro-biology'
+                        'exo archaeology'
+                    ]))
+                    bookText = \
+                        'SAMPLE REPORT §4{}§r\n'.format(randomCodes) + \
+                        'date: §dSOL{}/EPOC{}:T+{}{}§r\n'.format(
+                            rng.integers(1, 9),
+                            rng.integers(1, 11),
+                            rng.integers(20, 28),
+                            rng.integers(0, 61),
+                        ) + \
+                        author + '§2 PART OF  EXPEDITION {}§r\n'.format(
+                            ''.join(rng.choice(list(string.hexdigits), size=3))) + \
+                        'SUBJECT: §a SAMPLE OF {}§r\n'.format(randomCodesSampleName) + \
+                        '§rINTRODUCTION\n' + \
+                        '§k' + ''.join(
+                            rng.choice(list(string.hexdigits), size=rng.integers(100, 1000))) + ' §r\f' + \
+                        '§rRESULTS and DISCUSSION\n' + \
+                        '§k' + ''.join(
+                            rng.choice(list(string.hexdigits), size=rng.integers(100, 1000))) + ' §r\f' + \
+                        '§rCONCLUSION\n' + \
+                        '§k' + ''.join(
+                            rng.choice(list(string.hexdigits), size=rng.integers(100, 1000))) + '\f'
+                    newItemDict['tag'] = bookData(
+                        text=bookText,
+                        title='$4 SAMPLE REPORT {}'.format(randomCodes),
+                        author=author,
+                        description=f'Subject: {randomCodesSampleName}',
+                    )
+                newInventory.append(newItemDict)
             block = nbtTools.setInventoryContents(block, newInventory)
             transformedPosition = vectorTools.rotatePointAroundOrigin3D(
                 origin=self.boxInWorldSpace.middle,

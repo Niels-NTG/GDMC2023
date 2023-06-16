@@ -2,20 +2,16 @@ import numpy as np
 
 import globals
 import settlementTools
-from settlement.DebugSettlement import DebugSettlement
+from settlement.FaunaObservationPost import FaunaObservationPost
 
 globals.initialize()
 
-# TODO create settlement class
-#   - objective function
-#   - structure sets
 
-
-globalRNG = np.random.default_rng(847283947239819292)
+globalRNG = np.random.default_rng()
 
 # START generator
 
-DebugSettlement(rng=globalRNG)
+FaunaObservationPost(rng=globalRNG)
 
 # END generator
 

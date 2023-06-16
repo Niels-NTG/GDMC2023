@@ -15,6 +15,7 @@ import vectorTools
 from gdpc.gdpc import lookup, interface
 from gdpc.gdpc.block import Block
 from gdpc.gdpc.vector_tools import Box, Rect, loop2D
+from gdpc.gdpc.minecraft_tools import bookData
 
 DEFAULT_HEIGHTMAP_TYPE: str = 'MOTION_BLOCKING_NO_PLANTS'
 

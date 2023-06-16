@@ -74,7 +74,8 @@ class TowerObservation(Structure):
     def inventoryTable(self) -> dict[str, (float, int)]:
         return {
             'spyglass': (0.2, 1),
-            'map': (0.2, 1),
+            'written_book': (0.5, 1),
+            'map': (0.6, 1),
             'writable_book': (0.4, 1),
             'book': (0.1, 1),
             'paper': (0.1, 16),

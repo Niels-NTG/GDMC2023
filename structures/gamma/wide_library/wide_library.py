@@ -36,6 +36,7 @@ class WideLibrary(Structure):
         return {
             'map': (0.2, 1),
             'writable_book': (0.4, 1),
+            'written_book': (0.97, 1),
             'book': (0.4, 1),
             'paper': (0.1, 16),
             'music_disc_13': (0.001, 1),
