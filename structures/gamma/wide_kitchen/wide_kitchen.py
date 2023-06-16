@@ -98,6 +98,37 @@ class WideKitchen(Structure):
             )
         ]
 
+    @property
+    def inventoryTable(self) -> dict[str, (float, int)]:
+        return {
+            'apple': (0.2, 8),
+            'mushroom_stew': (0.1, 16),
+            'melon_slice': (0.2, 4),
+            'carrot': (0.3, 16),
+            'potato': (0.3, 16),
+            'sweet_berries': (0.1, 16),
+            'glow_berries': (0.08, 8),
+            'golden_apple': (0.0009, 1),
+            'bread': (0.3, 4),
+            'cookie': (0.1, 8),
+            'beetroot_soup': (0.1, 2),
+            'baked_potato': (0.1, 8),
+            'poisonous_potato': (0.06, 6),
+            'pumpkin_pie': (0.07, 1),
+            'beetroot': (0.1, 16),
+            'honey_bottle': (0.1, 1),
+            'dried_kelp': (0.1, 16),
+            'cake': (0.004, 1),
+            'water_bucket': (0.04, 1),
+            'cocoa_beans': (0.08, 8),
+            'pumpkin_seeds': (0.1, 16),
+            'brown_mushroom': (0.2, 16),
+            'red_mushroom': (0.1, 4),
+            'beedroot_seeds': (0.02, 8),
+            'wheat_seeds': (0.1, 16),
+            'paper': (0.02, 4),
+        }
+
     def evaluateStructure(self) -> float:
         cost = super().evaluateStructure()
 
@@ -116,8 +147,6 @@ class WideKitchen(Structure):
 
     def doPostProcessingSteps(self, node: Node = None):
         super().doPostProcessingSteps(node)
-
-        # TODO fill barrals with random foodstuffs
 
         # Place pillar
         pillarPositions: list[ivec2] = [

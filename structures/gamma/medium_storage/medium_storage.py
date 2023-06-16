@@ -27,7 +27,7 @@ class MediumStorage(Structure):
             settlementType=settlementType,
         )
 
-        self.customProperties['storageCapacity'] = 8
+        self.customProperties['storageCapacity'] = 1
 
     @property
     def connectors(self) -> list[Connector]:

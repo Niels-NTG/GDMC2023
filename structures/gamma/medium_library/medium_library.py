@@ -52,6 +52,29 @@ class MediumLibrary(Structure):
             )
         ]
 
+    @property
+    def inventoryTable(self) -> dict[str, (float, int)]:
+        return {
+            'map': (0.2, 1),
+            'writable_book': (0.4, 1),
+            'book': (0.4, 1),
+            'paper': (0.1, 16),
+            'music_disc_13': (0.001, 1),
+            'music_disc_blocks': (0.001, 1),
+            'music_disc_cat': (0.001, 1),
+            'music_disc_chirp': (0.001, 1),
+            'music_disc_far': (0.001, 1),
+            'music_disc_mall': (0.001, 1),
+            'music_disc_pigstep': (0.001, 1),
+            'music_disc_5': (0.0001, 1),
+            'disc_fragment_5': (0.004, 1),
+            'music_disk_ward': (0.001, 1),
+            'music_disk_11': (0.001, 1),
+            'echo_shard': (0.001, 1),
+            'name_tag': (0.08, 1),
+            'golden_apple': (0.0009, 1),
+        }
+
     def evaluateStructure(self) -> float:
         cost = super().evaluateStructure()
 

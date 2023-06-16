@@ -30,7 +30,7 @@ class RootNode(Node):
     def getPossibleActions(self) -> list[Action]:
         if self.hasPossibleActionsCache:
             return list(self.possibleActions)
-        sampleSize = max(2, int(worldTools.buildAreaSqrt() // 40))
+        sampleSize = max(2, int(worldTools.buildAreaSqrt() // 20))
         sampleLocations = self.rng.uniform(globals.buildarea.begin, globals.buildarea.end, (sampleSize, 2)).astype(int)
         for location in sampleLocations:
             # noinspection PyTypeChecker

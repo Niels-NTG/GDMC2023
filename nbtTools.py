@@ -39,6 +39,9 @@ def setInventoryContents(inventoryBlock: Block, contents: list[dict]) -> Block:
     if inventoryBlock.id not in INVENTORY_BLOCKS:
         return inventoryBlock
 
+    if len(contents) == 0:
+        return inventoryBlock
+
     newChestContents = '{Items: ['
     inventoryDimensions = CONTAINER_BLOCK_TO_INVENTORY_SIZE[inventoryBlock.id]
     inventorySlots = np.reshape(

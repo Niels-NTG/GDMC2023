@@ -27,29 +27,57 @@ class FaunaObservationPost:
 
         nodeList: list[Node] = []
 
-        explorationContant = 4.0
+        areasWithVillagers = FaunaObservationPost.findVillagers()
+        if len(areasWithVillagers) == 0:
+            return
+        topArea = max(areasWithVillagers, key=len)
+        topAreaRect: Rect = topArea.area.toRect()
+        scanRadius = 200
+        villageAreas: list[Rect] = []
+        numberOfVillagers = len(topArea)
+        for areaWithVillagers in areasWithVillagers:
+            areaRect: Rect = areaWithVillagers.area.toRect()
+            if areaWithVillagers is topAreaRect:
+                continue
+            if glm.distance(areaRect.center.to_tuple(), topAreaRect.center.to_tuple()) < scanRadius:
+                villageAreas.append(areaRect)
+                numberOfVillagers += len(areaWithVillagers)
+        villageRect: Rect = vectorTools.mergeRects(villageAreas)
+        outerRect: Rect = villageRect.centeredSubRect(size=villageRect.size + 128)
+
+        print(f'Found village at {villageRect.middle} with {numberOfVillagers} villagers')
+        print('Starting construction of villager observation post…')
+
         initialSettlementProperties = {
             'workerSize': 0,
             'kitchenSize': 0,
             'foodSize': 0,
             'archiveSize': 0,
+            'storageSize': 0,
+            'observationSize': 0
         }
 
-        numberOfVillagers = 22
         personelRequirement = 4 + numberOfVillagers
         kitchenRequirement = personelRequirement
         foodRequirement = personelRequirement
-        archiveRequirement = max(1, numberOfVillagers // 6)
-        storageRequirement = max(2, personelRequirement // 4)
+        archiveRequirement = max(1, numberOfVillagers // 8)
+        storageRequirement = max(2, personelRequirement // 8)
+        observationRequirment = 1
 
         def multiObjectiveBookKeeper(node: Node):
             node.bookKeepingProperties['workerSize'] += node.structure.customProperties.get('workerCapacity', 0)
             node.bookKeepingProperties['kitchenSize'] += node.structure.customProperties.get('kitchenCapacity', 0)
             node.bookKeepingProperties['foodSize'] += node.structure.customProperties.get('foodUnits', 0)
             node.bookKeepingProperties['archiveSize'] += node.structure.customProperties.get('archiveCapacity', 0)
+            node.bookKeepingProperties['storageSize'] += node.structure.customProperties.get('storageCapacity', 0)
+            node.bookKeepingProperties['observationSize'] += \
+                node.structure.customProperties.get('observationCapacity', 0)
 
         def villageObservationPostActionFilter(candidateStructure: Structure) -> bool:
-            return True
+            # noinspection PyTypeChecker
+            return not villageRect.collides(candidateStructure.rectInWorldSpace) and \
+                    outerRect.collides(candidateStructure.rectInWorldSpace)
+
         def bedsRewardFunction(node: Node) -> float:
             if node.bookKeepingProperties['workerSize'] > personelRequirement:
                 return -1
@@ -72,7 +100,7 @@ class FaunaObservationPost:
             rootNode=rootNode,
             rng=rng,
             targetName=f'{settlementType}_beds',
-            explorationConstant=explorationContant,
+            explorationConstant=np.sqrt(personelRequirement) / 3,
         )
         nodeList.extend(nodeListPart)
         rootNode = nodeList[0]
@@ -87,7 +115,7 @@ class FaunaObservationPost:
             rootNode=rootNode,
             rng=rng,
             targetName=f'{settlementType}_kitchens',
-            explorationConstant=explorationContant,
+            explorationConstant=np.sqrt(kitchenRequirement) / 2,
         )
         nodeList.extend(nodeListPart)
 
@@ -101,7 +129,7 @@ class FaunaObservationPost:
             rootNode=rootNode,
             rng=rng,
             targetName=f'{settlementType}_food',
-            explorationConstant=explorationContant,
+            explorationConstant=np.sqrt(foodRequirement) / 1.8,
         )
         nodeList.extend(nodeListPart)
 
@@ -115,9 +143,39 @@ class FaunaObservationPost:
             rootNode=rootNode,
             rng=rng,
             targetName=f'{settlementType}_archive',
-            explorationConstant=explorationContant,
+            explorationConstant=np.sqrt(archiveRequirement) / 2,
         )
         nodeList.extend(nodeListPart)
+
+        def storageRewardFunction(node: Node) -> float:
+            if node.bookKeepingProperties['storageSize'] > storageRequirement:
+                return -1
+            return node.bookKeepingProperties['storageSize']
+
+        rootNode.rewardFunction = storageRewardFunction
+        nodeListPart = settlementTools.runSearcher(
+            rootNode=rootNode,
+            rng=rng,
+            targetName=f'{settlementType}_storage',
+            explorationConstant=np.sqrt(storageRequirement) / 2,
+        )
+        nodeList.extend(nodeListPart)
+
+        def observationRewardFunction(node: Node) -> float:
+            if node.bookKeepingProperties['observationSize'] > observationRequirment:
+                return -1
+            return node.bookKeepingProperties['observationSize']
+
+        rootNode.rewardFunction = observationRewardFunction
+        nodeListPart = settlementTools.runSearcher(
+            rootNode=rootNode,
+            rng=rng,
+            targetName=f'{settlementType}_observation',
+            explorationConstant=0.1,
+        )
+        nodeList.extend(nodeListPart)
+
+        print('Finished construction of villager observation post')
 
     @staticmethod
     def findDrowned() -> list[worldTools.EntitiesPerArea]:

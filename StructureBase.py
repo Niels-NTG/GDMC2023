@@ -139,6 +139,12 @@ class Structure:
                 return connector
         return Connector(facing=2)
 
+    @property
+    def inventoryTable(self) -> dict[str, (float, int)]:
+        return {
+            'paper': (0.5, 6),
+        }
+
     def setInventoryBlocks(
         self,
         rng: np.random.Generator = np.random.default_rng()
@@ -153,17 +159,16 @@ class Structure:
             inventoryDimensions: ivec2 = CONTAINER_BLOCK_TO_INVENTORY_SIZE[block.id]
             newInventory = []
             for inventorySlots in range(inventoryDimensions.x * inventoryDimensions.y):
-                if rng.random() < 0.5:
+                itemType = rng.choice(list(self.inventoryTable.keys()))
+                itemRarity, itemMaxQuantity = self.inventoryTable.get(itemType)
+                if rng.random() > itemRarity:
                     continue
-
-                # TODO generate item from table
-                material = 'paper'
 
                 newInventory.append({
                     'x': rng.integers(inventoryDimensions.x),
                     'y': rng.integers(inventoryDimensions.y),
-                    'material': material,
-                    'amount': rng.integers(1, 6)
+                    'material': itemType,
+                    'amount': rng.integers(1, itemMaxQuantity + 1)
                 })
             block = nbtTools.setInventoryContents(block, newInventory)
             transformedPosition = vectorTools.rotatePointAroundOrigin3D(
