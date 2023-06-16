@@ -21,6 +21,10 @@ class FaunaObservationPost:
 
         FaunaObservationPost.buildVillageObservationPost(rng)
 
+        FaunaObservationPost.buildPillagerObservationPost(rng)
+
+        FaunaObservationPost.buildWitchObservationPost(rng)
+
     @staticmethod
     def buildVillageObservationPost(rng: np.random.Generator = np.random.default_rng()):
         settlementType = 'villageObservationPost'
