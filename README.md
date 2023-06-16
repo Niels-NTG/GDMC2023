@@ -1,6 +1,8 @@
 # GDMC 2023
 Submission by Niels-NTG for the [2023 AI Settlement Generation Challenge](https://gendesignmc.engineering.nyu.edu/).
 
+Also check out the [repo](https://github.com/Niels-NTG/gdmc2023) if you aren't there already for post-submission developments.
+
 In this competition participants design and implement an algorithm that constructs a settlement in Minecraft. Submissions are judged on the aesthetics and narrative qualities of the output, on how functional the structure is from a gameplay perspective, and how well it adapts to any arbitrary Minecraft landscape.
 
 ## Field Lab Gamma γ
