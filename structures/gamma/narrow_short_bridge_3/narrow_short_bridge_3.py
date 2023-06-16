@@ -42,6 +42,8 @@ class NarrowShortBridge3(Structure):
                         'wide_library',
                         'wide_kitchen',
                         'wide_greenhouse',
+                        'tower_observation',
+                        'medium_storage',
                     ]
                 ),
                 Connector(
@@ -59,6 +61,8 @@ class NarrowShortBridge3(Structure):
                         'wide_library',
                         'wide_kitchen',
                         'wide_greenhouse',
+                        'tower_observation',
+                        'medium_storage',
                     ]
                 )
             ]
