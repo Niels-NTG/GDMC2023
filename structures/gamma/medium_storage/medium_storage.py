@@ -52,6 +52,29 @@ class MediumStorage(Structure):
             )
         ]
 
+    @property
+    def inventoryTable(self) -> dict[str, (float, int)]:
+        return {
+            'iron_hoe': (0.1, 1),
+            'iron_axe': (0.1, 1),
+            'iron_shovel': (0.1, 1),
+            'iron_pickaxe': (0.1, 1),
+            'fishing_rod': (0.1, 1),
+            'compass': (0.1, 1),
+            'shears': (0.1, 4),
+            'recovery_compass': (0.1, 1),
+            'gold_nugget': (0.01, 32),
+            'emerald': (0.01, 16),
+            'clay_ball': (0.08, 32),
+            'coal': (0.1, 64),
+            'gunpowder': (0.07, 32),
+            'tnt': (0.04, 4),
+            'diamond_hoe': (0.01, 1),
+            'diamond_axe': (0.01, 1),
+            'diamond_shovel': (0.01, 1),
+            'diamond_pickaxe': (0.01, 1),
+        }
+
     def evaluateStructure(self) -> float:
         cost = super().evaluateStructure()
 
