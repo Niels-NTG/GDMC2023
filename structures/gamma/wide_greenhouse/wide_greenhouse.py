@@ -62,7 +62,6 @@ class WideGreenhouse(Structure):
             )
         ) * 4) ** 2.0
         if pillarCost <= 0:
-            # If pillar cost is negative, do not built underground
             pillarCost = 4
         score += pillarCost
 
