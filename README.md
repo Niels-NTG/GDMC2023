@@ -4,7 +4,9 @@ Submission by Niels-NTG for the [2023 Generative Design in Minecraft AI Settleme
 In this competition participants design and implement an algorithm that constructs a settlement in Minecraft. Submissions are judged on the aesthetics and narrative qualities of the output, on how functional the structure is from a gameplay perspective, and how well it adapts to any arbitrary Minecraft landscape.
 
 ## Field Lab Gamma γ
-Field Lab Gamma is a mysterious scientific research station that suddenly just appeared into the world. Where did it come from? Who were the staff? What were they looking for and where have they gone to?
+> *For days I had this strange feeling of being watched from afar. Then suddenly one morning this strange structure appeared on the horizon. Yes. We're definitely being watched.*
+
+Field Lab Gamma is a mysterious scientific research station that suddenly just appeared into the world. Where did it come from? Who were the staff? Why were they spying on the villagers and where are they now?
 
 ![2023-07-08_14.26.17](./screenshots/2023-07-08_14.26.17.png)![2023-06-16_14.02.55](./screenshots/2023-06-16_14.02.55.png)![2023-07-08_14.35.54](./screenshots/2023-07-08_14.35.54.png)![2023-07-08_14.26.17](./screenshots/2023-07-08_14.42.26.png)
 
